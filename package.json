@@ -1,0 +1,16 @@
+{
+  "name": "node-red-cyg-odata",
+  "node-red": {
+    "nodes": {
+      "odata": "index.js"
+    }
+  },
+  "version": "0.0.1",
+  "description": "Odata Connector Node-Red",
+  "main": "index.js",
+  "scripts": {},
+  "author": "Ravi-Kaushish",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {}
+}
