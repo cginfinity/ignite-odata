@@ -53,8 +53,8 @@ exports.GetResponse = async (info, data) => {
                                   // }
         // return 'http://services.odata.org/V4/(S(e2ubtwuqskobeuei04iyznwv))/TripPinServiceRW/$metadata#People'
         return result = {
-          ab: "asdfsdf",
-          cd: "asdfsdfsdafas"
+          "@odata.context": "http://services.odata.org)/TripPinServiceRW/$metadata#People",
+          data: data
         }
     } catch (err) {
       return (result = {
