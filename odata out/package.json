@@ -2,17 +2,15 @@
   "name": "node-red-cyg-odata",
   "node-red": {
     "nodes": {
-      "odata": "index.js"
+      "odata out": "index.js"
     }
   },
   "version": "0.0.1",
-  "description": "Odata Connector Node-Red",
+  "description": "Odata out - produces an odata complaint output",
   "main": "index.js",
   "scripts": {},
   "author": "Ravi-Kaushish",
   "license": "ISC",
-  "dependencies": {
-    "express": "^4.17.1"
-  },
+  "dependencies": {},
   "devDependencies": {}
 }
