@@ -6,7 +6,7 @@
     }
   },
   "version": "0.0.1",
-  "description": "Odata connector CG Ignite",
+  "description": "Odata Connector CG Ignite",
   "main": "index.js",
   "scripts": {},
   "author": "Ravi-Kaushish",
