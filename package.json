@@ -1,12 +1,12 @@
 {
-  "name": "node-red-cyg-odata",
+  "name": "ignite-odata",
   "node-red": {
     "nodes": {
       "odata in": "index.js"
     }
   },
   "version": "0.0.1",
-  "description": "Odata in- Accepts an odata comlaint url and breaks it into sql queries",
+  "description": "Odata connector CG Ignite",
   "main": "index.js",
   "scripts": {},
   "author": "Ravi-Kaushish",

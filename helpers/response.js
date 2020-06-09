@@ -1,65 +1,58 @@
 exports.GetResponse = async (info, data) => {
-    try {
-                                  // query = 'select * from tablename';
-                                  // full_resource_path = info.resource_path
-                                  // data_query_params = info.query_params
-                                  // //isolating service root and entity name
-                                  // resource_path = full_resource_path.split('/');
-                              
-                                  // //the resource_path array can have atmost 4 components
-                                  // //1 The empty element wrapping the odata root service /ServiceRoot/
-                                  // //2 The root or odata element ending in forward slash according to odata convention
-                              
-                                  // //3 The entity name along with the property for comparison, e.g.
-                                  // //http://127.0.0.1:1880/root/users(UserName='Ravi')/name,class
-                              
-                                  // //4 Property name to fetch raw value of properties passed in the url,
-                                  // //Note: Multiple properties must be separeted by comma in url
-                                  // //http://127.0.0.1:1880/root/users(UserName='Ravi')/name,class
-                              
-                                  // entity = resource_path[2]
-                                  // properties = resource_path[3]
-                                  // //testing if the user requested metdata or batch service request
-                                  // if (entity === '$metadata') {
-                                  //   query = `SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES`
-                                  // }
-                                  // else if (entity === '$batch') {
-                                  //   query = `BatchSegment translation is not supported`
-                                  // }
-                                  // else {
-                                  //   //checking for query param in parenthesis 
-                                  //   if (full_resource_path.includes("(")) {
-                                  //     //isolating table name and first comparison parameter
-                                  //     entity_with_param = entity
-                                  //     entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
-                                  //     entity_with_param = entity_with_param.split('(');
-                                  //     entity = entity_with_param[0]
-                                  //     param = entity_with_param[1]
-                                  //     query = query + " where "
-                                  //     query = query + param
-                                  //   }
-                                  //   //replacing table name with extracted entity
-                                  //   query = query.replace("tablename", entity);
-                                  //   //extracting column names(property) from url
-                                  //   // e.g. GET serviceRoot/Airports('KSFO')/Name
-                                  //   //adding logic to add column names in query
-                                  //   if (properties) {
-                                  //     query = query.replace("*", properties);
-                                  //   }
-                                  //   if (data_query_params) {
-                              
-                              
-                                  //   }
-                                  // }
-        // return 'http://services.odata.org/V4/(S(e2ubtwuqskobeuei04iyznwv))/TripPinServiceRW/$metadata#People'
-        return result = {
-          "@odata.context": "http://services.odata.org)/TripPinServiceRW/$metadata#People",
-          data: data
+  try {
+    full_resource_path = info.resource_path
+    resource_path = full_resource_path.split('/');
+    entity = resource_path[2]
+    properties = resource_path[3]
+    raw_value_request = resource_path[4]
+    serviceRoot = "ServiceRoot/"
+    complete_url = info.original_url
+    // odataContext = ""
+    // if (raw_value_request === undefined && properties === undefined) {
+    //   if
+    //   return result = {
+    //     "@odata.context": serviceRoot + "$metadata" + "#" + entity,
+    //     value: data
+    //   }
+    // }
+    // else if (raw_value_request === undefined && properties !== undefined) {
+    //   return result = {
+    //     "@odata.context": serviceRoot + "$metadata" + "#" + entity + "/" + "$entity",
+    //     value: data
+    //   }
+    // }
+    // else {
+    //   return data
+    // }
+    return data = {
+      "@odata.context": "serviceRoot/$metadata#People/$entity",
+      "@odata.id": "serviceRoot/People('russellwhyte')",
+      "@odata.etag": 'W/"08D1694BF26D2BC9"',
+      "@odata.editLink": "serviceRoot/People('russellwhyte')",
+      "UserName": "russellwhyte",
+      "FirstName": "Russell",
+      "LastName": "Whyte",
+      "Emails": [
+        "Russell@example.com",
+        "Russell@contoso.com"
+      ],
+      "AddressInfo": [
+        {
+          "Address": "187 Suffolk Ln.",
+          "City": {
+            "CountryRegion": "United States",
+            "Name": "Boise",
+            "Region": "ID"
+          }
         }
-    } catch (err) {
-      return (result = {
-        message: "Couldn't frame an odata response",
-        error: err.message
-      });
+      ],
+      "Gender": "Male",
+      "Concurrency": 635404797346655200
     }
-  };
+  } catch (err) {
+    return (result = {
+      message: "Couldn't frame an odata response",
+      error: err.message
+    });
+  }
+};

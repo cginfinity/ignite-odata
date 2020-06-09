@@ -31,7 +31,7 @@ exports.GetSelectQuery = async (info) => {
     //isolating service root and entity name
     resource_path = full_resource_path.split('/');
 
-    //the resource_path array can have atmost 4 components
+    //the resource_path array can have atmost 5 components
     //1 The empty element wrapping the odata root service /ServiceRoot/
     //2 The root or odata element ending in forward slash according to odata convention
 
@@ -41,6 +41,9 @@ exports.GetSelectQuery = async (info) => {
     //4 Property name to fetch raw value of properties passed in the url,
     //Note: Multiple properties must be separeted by comma in url
     //http://127.0.0.1:1880/root/users(UserName='Ravi')/name,class
+
+    //5 http://127.0.0.1:1880/root/users(UserName='Ravi')/name/$Value
+    //To get the raw value of the property passed in the url
 
     entity = resource_path[2]
     properties = resource_path[3]
