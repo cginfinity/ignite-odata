@@ -10,6 +10,12 @@
   "main": "index.js",
   "scripts": {},
   "author": "Ravi-Kaushish",
+  "keywords": [
+    "CG",
+    "ignite",
+    "node-red",
+    "odata"
+  ],
   "license": "ISC",
   "dependencies": {},
   "devDependencies": {}
