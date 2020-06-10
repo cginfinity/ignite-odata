@@ -1,8 +1,8 @@
 {
-  "name": "ignite-odata",
+  "name": "@cgignite/ignite-odata",
   "node-red": {
     "nodes": {
-      "odata in": "index.js"
+      "odata": "index.js"
     }
   },
   "version": "1.0.0",
