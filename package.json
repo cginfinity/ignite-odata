@@ -5,7 +5,7 @@
       "odata": "index.js"
     }
   },
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "Odata Connector CG Ignite",
   "main": "index.js",
   "scripts": {},
@@ -13,7 +13,6 @@
   "keywords": [
     "CG",
     "ignite",
-    "node-red",
     "odata"
   ],
   "license": "ISC",

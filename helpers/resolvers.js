@@ -8,7 +8,7 @@ const { GetQuery: sqliteGetQuery } = require('./resolvers/sqlite');
 
 exports.GetQueries = async (info) => {
   try {
-    return queries = await {
+    return queries = {
       db2: await db2GetQuery(info),
       mariadb: await mariadbGetQuery(info),
       mssql: await mssqlGetQuery(info),

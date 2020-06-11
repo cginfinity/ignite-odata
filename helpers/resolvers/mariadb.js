@@ -1,4 +1,4 @@
-const { GetUpdateSetColumns, GetInsertionColumnsAndValues } = require('../sql')
+const { GetUpdateSetColumns, GetInsertionColumnsAndValues, GetMetadataQuery } = require('../sql')
 
 // returns a mariadb query based on url method and parameters
 exports.GetQuery = async (info) => {
@@ -48,11 +48,11 @@ exports.GetSelectQuery = async (info) => {
     entity = resource_path[2]
     properties = resource_path[3]
     //testing if the user requested metdata or batch service request
-    if (entity === '$metadata') {
-      query = `SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES`
+    if (entity === '$metadata' || entity === '') {
+      return query = GetMetadataQuery();
     }
-    else if (entity === '$batch') {
-      query = `BatchSegment translation is not supported`
+    else if (entity === undefined) {
+      query = `SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES`
     }
     else {
       //checking for query param in parenthesis 
