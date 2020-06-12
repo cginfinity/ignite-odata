@@ -79,7 +79,7 @@ exports.GetSelectQuery = async (info) => {
 
       }
     }
-    return entity
+    return query
   } catch (err) {
     return (result = {
       error: err
