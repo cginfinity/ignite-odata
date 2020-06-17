@@ -5,7 +5,7 @@
       "odata": "index.js"
     }
   },
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Odata Connector CG Ignite",
   "main": "index.js",
   "scripts": {},
@@ -16,6 +16,8 @@
     "odata"
   ],
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "xmlbuilder": "^15.1.1"
+  },
   "devDependencies": {}
 }

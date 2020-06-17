@@ -43,57 +43,31 @@ exports.GetUpdateSetColumns = (data) => {
 
 // returns the set conditions for the update query
 exports.GetMetadataQuery = () => {
-  return `SELECT 
-            TABLE_NAME AS '@Name',
-          CASE
-            WHEN 
-              TABLE_TYPE = 'BASE TABLE'
-            THEN 
-              'Table' 
-            ELSE 'View'
-          END AS '@Type',
-          (SELECT 
-            Column_Name AS '@Name',
-            DATA_TYPE AS '@DataType',
-                IS_NULLABLE AS '@IsNullable',
-            CASE data_type 
-              WHEN 
-                'nvarchar' 
-              THEN 
-                CHARACTER_MAXIMUM_LENGTH 
-              WHEN 
-                'varchar'  
-              THEN 
-                CHARACTER_MAXIMUM_LENGTH
-                    ELSE 
-                NULL 
-            END	AS '@Length',
-            COLUMNPROPERTY(OBJECT_ID(TABLE_NAME),
-            COLUMN_NAME, 'IsIdentity')
-            AS '@IsIdentity',
-          (SELECT
-            tc.CONSTRAINT_TYPE 
-          FROM
-            INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc
-          INNER JOIN
-            INFORMATION_SCHEMA.KEY_COLUMN_USAGE cu
-          ON  tc.CONSTRAINT_NAME = cu.CONSTRAINT_NAME
-          WHERE
-            tc.TABLE_NAME = INFORMATION_SCHEMA.COLUMNS.TABLE_NAME
-          AND cu.COLUMN_NAME = INFORMATION_SCHEMA.COLUMNS.Column_Name)
-          AS '@Constraint'
-            FROM 
-            INFORMATION_SCHEMA.COLUMNS 
-            WHERE 
-            INFORMATION_SCHEMA.COLUMNS.TABLE_NAME = INFORMATION_SCHEMA.TABLES.TABLE_NAME
-            ORDER BY
-            INFORMATION_SCHEMA.COLUMNS.ORDINAL_POSITION
-            FOR XML PATH ('Property'), TYPE)
-        FROM 
-          INFORMATION_SCHEMA.TABLES
-        WHERE 
-          TABLE_SCHEMA='dbo'
-        ORDER BY 
-          TABLE_NAME ASC  
-        For XML PATH ('EntityType'),Root('EntitySet')`
+  return `SELECT  
+	TAB.TABLE_NAME AS Entity,
+	COL.COLUMN_NAME AS Property,
+	COL.Data_Type AS Type,
+	CASE 
+		WHEN Col.IS_NULLABLE = 'YES'
+		THEN 'true'
+		ELSE 'false'
+	END AS Nullable,
+	CASE 
+		WHEN CONS.CONSTRAINT_NAME LIKE 'PK%'
+		THEN 1
+		ELSE 0
+	END AS Primary_Key
+FROM
+	 	INFORMATION_SCHEMA.TABLES TAB 
+	LEFT JOIN
+		INFORMATION_SCHEMA.COLUMNS COL
+		ON TAB.TABLE_NAME = COL.TABLE_NAME AND
+		TAB.TABLE_SCHEMA = COL.TABLE_SCHEMA
+	LEFT JOIN 
+		INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE CONS
+		ON TAB.TABLE_NAME = CONS.TABLE_NAME AND
+		TAB.TABLE_SCHEMA =CONS.TABLE_SCHEMA
+		AND COL.COLUMN_NAME = CONS.COLUMN_NAME
+ORDER BY 
+	TAB.TABLE_NAME`
 };
