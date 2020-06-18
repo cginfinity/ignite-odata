@@ -3,9 +3,7 @@
         category: 'odata',
         color: '#d24714',
         defaults: {
-            name: { value: "" },
-            mdchecked: {value:"false"},
-            model: {value:""},
+            name: { value: "" }
         },
         inputs: 1,
         outputs: 1,
@@ -21,16 +19,6 @@
         <label for="node-input-name">Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
-    <div class="form-row">
-        <label style="display:inline;">Check</label>
-        <i style="display:inline;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</i>
-        <input type="checkbox" id="node-input-mdchecked" value="true" style="display:inline; width:15px; vertical-align:baseline;">
-        <label for="node-input-mdchecked" style="display:inline;">to provide model for metadata requests</label>
-    </div>
-    <div class="form-row">
-        <label for="node-input-model">Model</label>
-        <textarea type="text" id="node-input-model" rows="10"></textarea>
-    </div>
 </script>
 
 <script type="text/html" data-help-name="odata in">
@@ -42,7 +30,7 @@
         <br>
         2. The http in node must have a method type selected to accept an incoming request http to for that http method.
         <br>
-        3. The http in node must have <i style="color:#AD1625;">/ServiceRoot/</i> or <i style="color:#AD1625;">/root/</i> appended to the url 
+        3. The http in node must have <i style="color:#AD1625;">/example/</i> or <i style="color:#AD1625;">/odata/</i> appended to the url 
         to act as service root url for your odata service.
         <br>
         4. After the root URL, type in a valid odata url or append <i style="color:#AD1625;">*</i> to accept all the requests matching the root url.
@@ -62,13 +50,13 @@
     </div>
 </script>
 
-
 <script type="text/javascript">
     RED.nodes.registerType('odata out', {
         category: 'odata',
         color: '#d24714',
         defaults: {
             name: { value: "" },
+            modelbox: { value: "false" }
         },
         inputs: 1,
         outputs: 1,
@@ -85,6 +73,10 @@
         <label for="node-input-name">Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
+    <div class="form-row">
+        <input type="checkbox" id="node-input-modelbox" value="true" style="display:inline; width:15px; vertical-align:baseline;">
+        <label for="node-input-modelbox" style="display:inline;">, If you've added model for metadata requests</label>
+    </div>
 </script>
 
 <script type="text/html" data-help-name="odata out">
@@ -98,10 +90,13 @@
         <br>
         3. odata out node will convert the msg.payload into odata compatible format.
         <br>
-        4. to serve the metadata requests the user must provide a data model to the odata out node.
-        This can be done by inserting a function node and setting the <i style="color:#AD1625;">msg.model</i> object to a valid data model.
+        4. To serve the metadata requests the user must provide a data model to the odata out node.
         <br>
-        5. If the request comes for metadata, the node will return an edmx xml for the model specified by the user.
+        5. This can be done by inserting a function node and setting the <i style="color:#AD1625;">msg.model</i> object to a valid data model.
+        <br>
+        6. Check the metadata box if you've provided a msg.model object via a fucntion node.
+        <br>
+        7. If the request comes for metadata, the node will return an edmx xml for the model specified by the user.
         <br>
     </div>
 </script>

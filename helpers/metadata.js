@@ -1,6 +1,6 @@
 const builder = require('xmlbuilder');
 
-module.exports = function (model) {
+exports.GetMetadata =  (model) => {
   return buildMetadata(model)
 }
 
