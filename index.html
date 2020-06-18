@@ -42,11 +42,14 @@
         <br>
         2. The http in node must have a method type selected to accept an incoming request http to for that http method.
         <br>
-        3. Type in a valid odata url or append <i style="color:#AD1625;">/*</i> to accept all the requests matching the root url.
+        3. The http in node must have <i style="color:#AD1625;">/ServiceRoot/</i> or <i style="color:#AD1625;">/root/</i> appended to the url 
+        to act as service root url for your odata service.
         <br>
-        4. The odata node resolves the incoming request into sql statements and returns the queries inside <i style="color:#AD1625;">msg.payload.queries</i> for each db type it supports.
+        4. After the root URL, type in a valid odata url or append <i style="color:#AD1625;">*</i> to accept all the requests matching the root url.
         <br>
-        5. <i style="color:#AD1625; font-weight:bold;">Supports following Database Types:</i>
+        5. The odata node resolves the incoming request into sql statements and returns the queries inside <i style="color:#AD1625;">msg.payload.queries</i> for each db type it supports.
+        <br>
+        6. <i style="color:#AD1625; font-weight:bold;">Supports following Database Types:</i>
         <ol>
             <li>db2</li>
             <li>maria db</li>
