@@ -45,8 +45,8 @@ exports.GetSelectQuery = async (info) => {
     //5 http://127.0.0.1:1880/root/users(UserName='Ravi')/name/$Value
     //To get the raw value of the property passed in the url
 
-    entity = resource_path[2]
-    properties = resource_path[3]
+    entity = resource_path[1]
+    properties = resource_path[2]
     //testing if the user requested metdata or batch service request
     if (entity === '$metadata' || entity === '') {
       return query = GetMetadataQuery();
@@ -94,8 +94,8 @@ exports.GetInsertQuery = async (info) => {
     full_resource_path = info.resource_path
     //isolating service root and entity name
     resource_path = full_resource_path.split('/');
-    entity = resource_path[2]
-    properties = resource_path[3]
+    entity = resource_path[1]
+    properties = resource_path[2]
     if (entity === '$metadata') {
       query = `SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES`
     }
@@ -120,8 +120,8 @@ exports.GetUpdateQuery = async (info) => {
     full_resource_path = info.resource_path
     //isolating service root and entity name
     resource_path = full_resource_path.split('/');
-    entity = resource_path[2]
-    properties = resource_path[3]
+    entity = resource_path[1]
+    properties = resource_path[2]
     if (entity === '$metadata') {
       query = `SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES`
     }
@@ -158,8 +158,8 @@ exports.GetDeleteQuery = async (info) => {
     full_resource_path = info.resource_path
     //isolating service root and entity name
     resource_path = full_resource_path.split('/');
-    entity = resource_path[2]
-    properties = resource_path[3]
+    entity = resource_path[1]
+    properties = resource_path[2]
     if (entity === '$metadata') {
       query = `SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES`
     }
