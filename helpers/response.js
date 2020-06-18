@@ -2,9 +2,9 @@ exports.GetResponse = async (info, data) => {
   try {
     full_resource_path = info.resource_path
     resource_path = full_resource_path.split('/');
-    entity = resource_path[1]
-    properties = resource_path[2]
-    raw_value_request = resource_path[3]
+    entity = resource_path[2]
+    properties = resource_path[3]
+    raw_value_request = resource_path[4]
     serviceRoot = "ServiceRoot/"
     complete_url = info.original_url
     odataContext = ""
