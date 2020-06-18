@@ -94,5 +94,11 @@
         2. The messages sent to this node must originate from an odata in node.
         <br>
         3. odata out node will convert the msg.payload into odata compatible format.
+        <br>
+        4. to serve the metadata requests the user must provide a data model to the odata out node.
+        This can be done by inserting a function node and setting the <i style="color:#AD1625;">msg.model</i> object to a valid data model.
+        <br>
+        5. If the request comes for metadata, the node will return an edmx xml for the model specified by the user.
+        <br>
     </div>
 </script>
