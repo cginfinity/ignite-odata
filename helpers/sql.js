@@ -44,24 +44,14 @@ exports.GetUpdateSetColumns = (data) => {
 // returns the primary key from and edmx (json object model)
 exports.GetKeyFromModel = (model, tableName) => {
   for (entity in model.entityTypes) {
-    // console.log("TableName " + entity)
-    if (entity == tableName){
+    if (entity == tableName) {
       for (property in model.entityTypes[entity]) {
-        // console.log("ColumnName " + property)
         if (model.entityTypes[entity][property].key === true) {
-          console.log(property)
           return property
-        }
-        // for (attribute in model.entityTypes[entity][property]) {
-        //   console.log("Attribute Name " + attribute)
-        //   // console.log(model.entityTypes[entity][property][attribute])
-        //   if (model.entityTypes[entity][property][attribute] === true) {
-        //     console.log("this columns is key")
-        //   }
-        // }
+        };
       }
-    }
-  };
+    };
+  }
 };
 
 // returns the set conditions for the update query
