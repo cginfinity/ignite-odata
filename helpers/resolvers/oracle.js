@@ -17,7 +17,7 @@ exports.GetQuery = async (info) => {
     }
   } catch (err) {
     return (result = {
-      message: "Couldn't create mysql query",
+      message: "Couldn't create an oracle query",
       error: err
     });
   }
