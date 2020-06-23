@@ -5,7 +5,7 @@
       "odata": "index.js"
     }
   },
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Odata Connector CG Ignite",
   "main": "index.js",
   "scripts": {},
