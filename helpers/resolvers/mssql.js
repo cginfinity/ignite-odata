@@ -57,6 +57,8 @@ exports.GetSelectQuery = async (info) => {
         if(query_params.$top){
           limit = `select top ${query_params.$top}`
           query = query.replace("select", limit);
+        }if(query_params.$select){
+          query = query.replace("*", query_params.$select);
         }
         // if(query_params.$count){
         //   console.log("reached" + query_params.$top)
