@@ -2,9 +2,9 @@ const { GetUpdateSetColumns,
         GetInsertionColumnsAndValues,
         GetMetadataQuery,
         GetKeyFromModel
-      } = require('../sql')
-const { ConvertToOperator } = require('../operators')
-const { isEmpty } = require('../functions')
+      } = require('../sql');
+const { ConvertToOperator } = require('../operators');
+const { isEmpty, getEntity } = require('../functions');
 
 // returns a mysql query based on url, method, req. body and parameters
 exports.GetQuery = async (info) => {
@@ -58,7 +58,6 @@ exports.GetSelectQuery = async (info) => {
     }
     else {
       //logic to query data using query parameters in url
-      console.log(isEmpty(query_params))
       if (isEmpty(query_params) && full_resource_path.includes("(")) {
         //case to support get by id in odata e.g. http://127.0.0.1:1880/root/users('Ravi')
         query = 'SELECT * FROM tablename';
@@ -75,8 +74,12 @@ exports.GetSelectQuery = async (info) => {
         }
         return query.replace("tablename", entity);
       } else {
-        //case for find by id 
+        //case for find by id
         query = 'SELECT * FROM tablename';
+        //to counter user error where user appends user(id) with query parameters
+        if(full_resource_path.includes("(")){
+          entity= getEntity(entity)
+        }
         if (query_params.$top) {
           limit = `SELECT TOP ${query_params.$top}`
           query = query.replace("SELECT", limit);
