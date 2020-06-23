@@ -2,9 +2,9 @@ const { GetUpdateSetColumns,
   GetInsertionColumnsAndValues,
   GetMetadataQuery,
   GetKeyFromModel
-} = require('../sql')
-const { ConvertToOperator } = require('../operators')
-const { isEmpty } = require('../functions')
+} = require('../sql');
+const { ConvertToOperator } = require('../operators');
+const { isEmpty, getEntity } = require('../functions');
 
 // returns a mysql query based on url, method, req. body and parameters
 exports.GetQuery = async (info) => {
@@ -76,9 +76,9 @@ exports.GetSelectQuery = async (info) => {
       } else {
         //case for find by id 
         query = 'SELECT * FROM tablename';
-        if (query_params.$top) {
-          limit = `SELECT TOP ${query_params.$top}`
-          query = query.replace("SELECT", limit);
+        //to counter user error where user appends user(id) with query parameters
+        if (full_resource_path.includes("(")) {
+          entity = getEntity(entity)
         }
         if (query_params.$select) {
           query = query.replace("*", query_params.$select);
@@ -88,7 +88,10 @@ exports.GetSelectQuery = async (info) => {
           operand = predicates[0]
           operator = ConvertToOperator(predicates[1])
           value = predicates[2]
-          query = query + " where " + operand + " " + operator + " " + value
+          query = query + " WHERE " + operand + " " + operator + " " + value
+        }
+        if (query_params.$top) {
+          query = query + " LIMIT " + query_params.$top
         }
         return query.replace("tablename", entity);
       }
