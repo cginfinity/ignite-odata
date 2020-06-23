@@ -152,6 +152,8 @@ exports.GetUpdateQuery = async (info) => {
         primary_key = GetKeyFromModel(info.data_model, entity)
         query = query + primary_key + " = " + param
         return query.replace("tablename", entity);
+      }else{
+        return query.replace("tablename", entity);
       }
     }
   } catch (error) {
@@ -184,6 +186,8 @@ exports.GetDeleteQuery = async (info) => {
         query = query + " WHERE "
         primary_key = GetKeyFromModel(info.data_model, entity)
         query = query + primary_key + " = " + param
+        return query.replace("tablename", entity);
+      }else{
         return query.replace("tablename", entity);
       }
     }
