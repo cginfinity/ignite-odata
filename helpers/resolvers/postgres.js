@@ -1,6 +1,12 @@
-const { GetUpdateSetColumns, GetInsertionColumnsAndValues, GetMetadataQuery, GetKeyFromModel } = require('../sql')
+const { GetUpdateSetColumns,
+  GetInsertionColumnsAndValues,
+  GetMetadataQuery,
+  GetKeyFromModel
+} = require('../sql')
+const { ConvertToOperator } = require('../operators')
+const { isEmpty } = require('../functions')
 
-// returns a mysql query based on url method and parameters
+// returns a mysql query based on url, method, req. body and parameters
 exports.GetQuery = async (info) => {
   try {
     if (info.method === 'GET') {
@@ -16,18 +22,15 @@ exports.GetQuery = async (info) => {
       return await this.GetDeleteQuery(info)
     }
   } catch (err) {
-    return (result = {
-      message: "Couldn't create a postgres query",
-      error: err
-    });
+    return err;
   }
 };
 
 exports.GetSelectQuery = async (info) => {
   try {
-    query = 'select * from tablename';
+    query = '';
     full_resource_path = info.resource_path
-    data_query_params = info.query_params
+    query_params = info.query_params
     //isolating service root and entity name
     resource_path = full_resource_path.split('/');
     entity = resource_path[2]
@@ -51,12 +54,13 @@ exports.GetSelectQuery = async (info) => {
       return query = GetMetadataQuery();
     }
     else if (entity === '$batch') {
-      query = `BatchSegment translation is not supported`
+      return query = `BatchSegment translation is not supported`
     }
     else {
-      //checking for param in parenthesis 
-      if (full_resource_path.includes("(")) {
-        //isolating table name and first comparison parameter
+      //logic to query data using query parameters in url
+      if (isEmpty(query_params) && full_resource_path.includes("(")) {
+        //case to support get by id in odata e.g. http://127.0.0.1:1880/root/users('Ravi')
+        query = 'SELECT * FROM tablename';
         entity_with_param = entity
         entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
         entity_with_param = entity_with_param.split('(');
@@ -65,27 +69,31 @@ exports.GetSelectQuery = async (info) => {
         query = query + " WHERE "
         primary_key = GetKeyFromModel(info.data_model, entity)
         query = query + primary_key + " = " + param
-      }
-      //replacing table name with extracted entity
-      query = query.replace("tablename", entity);
-
-      //extracting column names(property) from url
-      // e.g. GET serviceRoot/Airports('KSFO')/Name
-
-      //logic to add column names in query
-      if (properties) {
-        query = query.replace("*", properties);
-      }
-      //logic to support query data using query parameters
-      if (data_query_params) {
-
+        if (properties) {
+          query = query.replace("*", properties);
+        }
+        return query.replace("tablename", entity);
+      } else {
+        //case for find by id 
+        query = 'SELECT * FROM tablename';
+        if (query_params.$select) {
+          query = query.replace("*", query_params.$select);
+        }
+        if (query_params.$filter) {
+          predicates = query_params.$filter.split(' ');
+          operand = predicates[0]
+          operator = ConvertToOperator(predicates[1])
+          value = predicates[2]
+          query = query + " where " + operand + " " + operator + " " + value
+        }
+        if (query_params.$top) {
+          query = query + " LIMIT " + query_params.$top
+        }
+        return query.replace("tablename", entity);
       }
     }
-    return query
-  } catch (err) {
-    return (result = {
-      error: err
-    });
+  } catch (error) {
+    return error;
   }
 };
 
@@ -108,10 +116,8 @@ exports.GetInsertQuery = async (info) => {
       query = query.replace("tablename", entity);
     }
     return query
-  } catch (err) {
-    return (result = {
-      error: err
-    });
+  } catch (error) {
+    return error;
   }
 };
 
@@ -141,15 +147,11 @@ exports.GetUpdateQuery = async (info) => {
         query = query + " WHERE "
         primary_key = GetKeyFromModel(info.data_model, entity)
         query = query + primary_key + " = " + param
+        return query.replace("tablename", entity);
       }
-      //replacing table name with extracted entity
-      query = query.replace("tablename", entity);
     }
-    return query
-  } catch (err) {
-    return (result = {
-      error: err
-    });
+  } catch (error) {
+    return error;
   }
 };
 
@@ -165,12 +167,11 @@ exports.GetDeleteQuery = async (info) => {
       return query = GetMetadataQuery();
     }
     else if (entity === '$batch') {
-      query = `BatchSegment translation is not supported`
+      return query = `BatchSegment translation is not supported`
     }
     else {
-       //checking for param in parenthesis 
-       if (full_resource_path.includes("(")) {
-        //isolating table name and first comparison parameter
+      //checking for param in parenthesis 
+      if (full_resource_path.includes("(")) {
         entity_with_param = entity
         entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
         entity_with_param = entity_with_param.split('(');
@@ -179,14 +180,10 @@ exports.GetDeleteQuery = async (info) => {
         query = query + " WHERE "
         primary_key = GetKeyFromModel(info.data_model, entity)
         query = query + primary_key + " = " + param
+        return query.replace("tablename", entity);
       }
-      //replacing table name with extracted entity
-      query = query.replace("tablename", entity);
     }
-    return query
-  } catch (err) {
-    return (result = {
-      error: err
-    });
+  } catch (error) {
+    return error;
   }
 };

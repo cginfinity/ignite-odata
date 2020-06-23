@@ -1,6 +1,12 @@
-const { GetUpdateSetColumns, GetInsertionColumnsAndValues, GetMetadataQuery, GetKeyFromModel } = require('../sql')
+const { GetUpdateSetColumns,
+        GetInsertionColumnsAndValues,
+        GetMetadataQuery,
+        GetKeyFromModel
+      } = require('../sql')
 const { ConvertToOperator } = require('../operators')
-// returns a mysql query based on url method and parameters
+const { isEmpty } = require('../functions')
+
+// returns a mysql query based on url, method, req. body and parameters
 exports.GetQuery = async (info) => {
   try {
     if (info.method === 'GET') {
@@ -52,11 +58,28 @@ exports.GetSelectQuery = async (info) => {
     }
     else {
       //logic to query data using query parameters in url
-      if (query_params) {
-        query = 'select * from tablename';
+      console.log(isEmpty(query_params))
+      if (isEmpty(query_params) && full_resource_path.includes("(")) {
+        //case to support get by id in odata e.g. http://127.0.0.1:1880/root/users('Ravi')
+        query = 'SELECT * FROM tablename';
+        entity_with_param = entity
+        entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
+        entity_with_param = entity_with_param.split('(');
+        entity = entity_with_param[0]
+        param = entity_with_param[1]
+        query = query + " WHERE "
+        primary_key = GetKeyFromModel(info.data_model, entity)
+        query = query + primary_key + " = " + param
+        if (properties) {
+          query = query.replace("*", properties);
+        }
+        return query.replace("tablename", entity);
+      } else {
+        //case for find by id 
+        query = 'SELECT * FROM tablename';
         if (query_params.$top) {
-          limit = `select top ${query_params.$top}`
-          query = query.replace("select", limit);
+          limit = `SELECT TOP ${query_params.$top}`
+          query = query.replace("SELECT", limit);
         }
         if (query_params.$select) {
           query = query.replace("*", query_params.$select);
@@ -66,27 +89,7 @@ exports.GetSelectQuery = async (info) => {
           operand = predicates[0]
           operator = ConvertToOperator(predicates[1])
           value = predicates[2]
-          query = query + "where " + operand + " " + operator + " " + value
-        }
-        // if(query_params.$count){
-        //   console.log("reached" + query_params.$top)
-        // }
-        return query.replace("tablename", entity);
-      } else if (full_resource_path.includes("(")) {
-        //case to support get by id in odata e.g. http://127.0.0.1:1880/root/users('Ravi')
-        query = 'select * from tablename';
-        //isolating table name and first comparison parameter
-        entity_with_param = entity
-        entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
-        entity_with_param = entity_with_param.split('(');
-        entity = entity_with_param[0]
-        param = entity_with_param[1]
-        query = query + " WHERE "
-        primary_key = GetKeyFromModel(info.data_model, entity)
-        console.log("primary key is " + primary_key)
-        query = query + primary_key + " = " + param
-        if (properties) {
-          query = query.replace("*", properties);
+          query = query + " where " + operand + " " + operator + " " + value
         }
         return query.replace("tablename", entity);
       }
@@ -146,11 +149,9 @@ exports.GetUpdateQuery = async (info) => {
         query = query + " WHERE "
         primary_key = GetKeyFromModel(info.data_model, entity)
         query = query + primary_key + " = " + param
+        return query.replace("tablename", entity);
       }
-      //replacing table name with extracted entity
-      query = query.replace("tablename", entity);
     }
-    return query
   } catch (error) {
     return error;
   }
@@ -173,7 +174,6 @@ exports.GetDeleteQuery = async (info) => {
     else {
       //checking for param in parenthesis 
       if (full_resource_path.includes("(")) {
-        query = 'select * from tablename';
         entity_with_param = entity
         entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
         entity_with_param = entity_with_param.split('(');
@@ -181,11 +181,7 @@ exports.GetDeleteQuery = async (info) => {
         param = entity_with_param[1]
         query = query + " WHERE "
         primary_key = GetKeyFromModel(info.data_model, entity)
-        console.log("primary key is " + primary_key)
         query = query + primary_key + " = " + param
-        if (properties) {
-          query = query.replace("*", properties);
-        }
         return query.replace("tablename", entity);
       }
     }
