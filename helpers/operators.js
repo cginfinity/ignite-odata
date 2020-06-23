@@ -1,5 +1,5 @@
 // returns the operator value based on odata expression in url
-const convertToOperator = (odataOperator) => {
+exports.ConvertToOperator = (odataOperator) => {
   let operator;
   switch (odataOperator) {
     case 'eq':
@@ -21,7 +21,7 @@ const convertToOperator = (odataOperator) => {
       operator = '<=';
       break;
     default:
-      throw new Error('Invalid operator code, expected one of ["==", "!=", ">", ">=", "<", "<="].');
+      throw new Error('Invalid operator code, expected one of ["=", "!=", ">", ">=", "<", "<="].');
   }
   return operator;
 };

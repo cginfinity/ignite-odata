@@ -1,5 +1,5 @@
 const { GetUpdateSetColumns, GetInsertionColumnsAndValues, GetMetadataQuery, GetKeyFromModel } = require('../sql')
-
+const { ConvertToOperator } = require('../operators')
 // returns a mysql query based on url method and parameters
 exports.GetQuery = async (info) => {
   try {
@@ -16,18 +16,15 @@ exports.GetQuery = async (info) => {
       return await this.GetDeleteQuery(info)
     }
   } catch (err) {
-    return (result = {
-      message: "Couldn't create mssql query",
-      error: err
-    });
+    return err;
   }
 };
 
 exports.GetSelectQuery = async (info) => {
   try {
-    query = 'select * from tablename';
+    query = '';
     full_resource_path = info.resource_path
-    data_query_params = info.query_params
+    query_params = info.query_params
     //isolating service root and entity name
     resource_path = full_resource_path.split('/');
     entity = resource_path[2]
@@ -51,11 +48,23 @@ exports.GetSelectQuery = async (info) => {
       return query = GetMetadataQuery();
     }
     else if (entity === '$batch') {
-      query = `BatchSegment translation is not supported`
+      return query = `BatchSegment translation is not supported`
     }
     else {
-      //checking for param in parenthesis 
-      if (full_resource_path.includes("(")) {
+      //logic to query data using query parameters in url
+      if (query_params) {
+        query = 'select * from tablename';
+        if(query_params.$top){
+          limit = `select top ${query_params.$top}`
+          query = query.replace("select", limit);
+        }
+        // if(query_params.$count){
+        //   console.log("reached" + query_params.$top)
+        // }
+        return query.replace("tablename", entity);
+      } else if (full_resource_path.includes("(")) {
+        //case to support get by id in odata e.g. http://127.0.0.1:1880/root/users('Ravi')
+        query = 'select * from tablename';
         //isolating table name and first comparison parameter
         entity_with_param = entity
         entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
@@ -64,28 +73,16 @@ exports.GetSelectQuery = async (info) => {
         param = entity_with_param[1]
         query = query + " WHERE "
         primary_key = GetKeyFromModel(info.data_model, entity)
+        console.log("primary key is " + primary_key)
         query = query + primary_key + " = " + param
-      }
-      //replacing table name with extracted entity
-      query = query.replace("tablename", entity);
-
-      //extracting column names(property) from url
-      // e.g. GET serviceRoot/Airports('KSFO')/Name
-
-      //logic to add column names in query
-      if (properties) {
-        query = query.replace("*", properties);
-      }
-      //logic to support query data using query parameters
-      if (data_query_params) {
-
+        if (properties) {
+          query = query.replace("*", properties);
+        }
+        return query.replace("tablename", entity);
       }
     }
-    return query
-  } catch (err) {
-    return (result = {
-      error: err
-    });
+  } catch (error) {
+    return error;
   }
 };
 
@@ -108,10 +105,8 @@ exports.GetInsertQuery = async (info) => {
       query = query.replace("tablename", entity);
     }
     return query
-  } catch (err) {
-    return (result = {
-      error: err
-    });
+  } catch (error) {
+    return error;
   }
 };
 
@@ -146,10 +141,8 @@ exports.GetUpdateQuery = async (info) => {
       query = query.replace("tablename", entity);
     }
     return query
-  } catch (err) {
-    return (result = {
-      error: err
-    });
+  } catch (error) {
+    return error;
   }
 };
 
@@ -165,12 +158,12 @@ exports.GetDeleteQuery = async (info) => {
       return query = GetMetadataQuery();
     }
     else if (entity === '$batch') {
-      query = `BatchSegment translation is not supported`
+      return query = `BatchSegment translation is not supported`
     }
     else {
-       //checking for param in parenthesis 
-       if (full_resource_path.includes("(")) {
-        //isolating table name and first comparison parameter
+      //checking for param in parenthesis 
+      if (full_resource_path.includes("(")) {
+        query = 'select * from tablename';
         entity_with_param = entity
         entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
         entity_with_param = entity_with_param.split('(');
@@ -178,15 +171,15 @@ exports.GetDeleteQuery = async (info) => {
         param = entity_with_param[1]
         query = query + " WHERE "
         primary_key = GetKeyFromModel(info.data_model, entity)
+        console.log("primary key is " + primary_key)
         query = query + primary_key + " = " + param
+        if (properties) {
+          query = query.replace("*", properties);
+        }
+        return query.replace("tablename", entity);
       }
-      //replacing table name with extracted entity
-      query = query.replace("tablename", entity);
     }
-    return query
-  } catch (err) {
-    return (result = {
-      error: err
-    });
+  } catch (error) {
+    return error;
   }
 };
