@@ -54,11 +54,19 @@ exports.GetSelectQuery = async (info) => {
       //logic to query data using query parameters in url
       if (query_params) {
         query = 'select * from tablename';
-        if(query_params.$top){
+        if (query_params.$top) {
           limit = `select top ${query_params.$top}`
           query = query.replace("select", limit);
-        }if(query_params.$select){
+        }
+        if (query_params.$select) {
           query = query.replace("*", query_params.$select);
+        }
+        if (query_params.$filter) {
+          predicates = query_params.$filter.split(' ');
+          operand = predicates[0]
+          operator = ConvertToOperator(predicates[1])
+          value = predicates[2]
+          query = query + "where " + operand + " " + operator + " " + value
         }
         // if(query_params.$count){
         //   console.log("reached" + query_params.$top)
