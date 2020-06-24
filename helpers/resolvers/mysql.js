@@ -12,6 +12,9 @@ exports.GetQuery = async (info) => {
     if (info.method === 'GET') {
       return await this.GetSelectQuery(info)
     }
+    else if (info.method === 'POST' && info.headers['x-http-method'] == "PATCH") {
+      return await this.GetUpdateQuery(info)
+    }
     else if (info.method === 'POST') {
       return await this.GetInsertQuery(info)
     }

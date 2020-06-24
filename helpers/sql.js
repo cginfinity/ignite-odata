@@ -4,7 +4,7 @@ exports.GetInsertionColumnsAndValues = (data) => {
     Values = "",
     count = 0;
   for (key in data) {
-    if(!key.includes("odata.type")){
+    if (!key.includes("odata.type")) {
       columns =
         count !== Object.keys(data).length - 1
           ? columns + key + ","
@@ -54,6 +54,28 @@ exports.GetInsertionColumnsAndValuesPrev = (data) => {
 
 // returns the set conditions for the update query
 exports.GetUpdateSetColumns = (data) => {
+  var condition = "", count = 0;
+  for (key in data) {
+    if (!key.includes("odata.type")) {
+      condition =
+        count !== Object.keys(data).length - 1
+          ? typeof data[key] === "string"
+            ? condition + key + "='" + data[key] + "',"
+            : condition + key + "=" + data[key] + ","
+          : typeof data[key] === "string"
+            ? condition + key + "='" + data[key] + '\''
+            : condition + key + "=" + data[key];
+      count++;
+    }
+  }
+  if (condition.charAt(condition.length - 1) === ",") {
+    condition = condition.substring(0, condition.length - 1);
+  }
+  return condition;
+};
+
+// returns the set conditions for the update query
+exports.GetUpdateSetColumnsPrev = (data) => {
   var condition = "", count = 0;
   for (key in data) {
     condition =

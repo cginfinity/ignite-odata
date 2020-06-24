@@ -12,6 +12,9 @@ exports.GetQuery = async (info) => {
     if (info.method === 'GET') {
       return await this.GetSelectQuery(info)
     }
+    else if (info.method === 'POST' && info.headers['x-http-method'] == "PATCH") {
+      return await this.GetUpdateQuery(info)
+    }
     else if (info.method === 'POST') {
       return await this.GetInsertQuery(info)
     }
@@ -152,7 +155,7 @@ exports.GetUpdateQuery = async (info) => {
         primary_key = GetKeyFromModel(info.data_model, entity)
         query = query + primary_key + " = " + param
         return query.replace("tablename", entity);
-      }else{
+      } else {
         return query.replace("tablename", entity);
       }
     }
@@ -188,7 +191,7 @@ exports.GetDeleteQuery = async (info) => {
         primary_key = GetKeyFromModel(info.data_model, entity)
         query = query + primary_key + " = " + param
         return query.replace("tablename", entity);
-      }else{
+      } else {
         return query.replace("tablename", entity);
       }
     }
