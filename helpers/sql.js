@@ -20,6 +20,12 @@ exports.GetInsertionColumnsAndValues = (data) => {
       count++;
     }
   }
+  if (columns.charAt(columns.length - 1) === ",") {
+    columns = columns.substring(0, columns.length - 1);
+  }
+  if (Values.charAt(Values.length - 1) === ",") {
+    Values = Values.substring(0, Values.length - 1);
+  }
   return {
     columns: columns,
     Values: Values
