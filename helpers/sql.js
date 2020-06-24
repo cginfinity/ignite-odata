@@ -4,6 +4,34 @@ exports.GetInsertionColumnsAndValues = (data) => {
     Values = "",
     count = 0;
   for (key in data) {
+    if(!key.includes("odata.type")){
+      columns =
+        count !== Object.keys(data).length - 1
+          ? columns + key + ","
+          : columns + key;
+      Values =
+        count !== Object.keys(data).length - 1
+          ? typeof data[key] === "string"
+            ? Values + "'" + data[key] + "'" + ","
+            : Values + data[key] + ","
+          : typeof data[key] === "string"
+            ? Values + "'" + data[key] + "'"
+            : Values + data[key];
+      count++;
+    }
+  }
+  return {
+    columns: columns,
+    Values: Values
+  };
+};
+
+// returns the columns and values for the insert query
+exports.GetInsertionColumnsAndValuesPrev = (data) => {
+  var columns = "",
+    Values = "",
+    count = 0;
+  for (key in data) {
     columns =
       count !== Object.keys(data).length - 1
         ? columns + key + ","

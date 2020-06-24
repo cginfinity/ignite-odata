@@ -163,6 +163,7 @@ exports.GetUpdateQuery = async (info) => {
 
 exports.GetDeleteQuery = async (info) => {
   try {
+    console.log(info)
     query = 'DELETE FROM tablename';
     full_resource_path = info.resource_path
     //isolating service root and entity name
