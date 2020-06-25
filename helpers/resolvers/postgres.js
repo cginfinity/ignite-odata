@@ -120,6 +120,7 @@ exports.GetInsertQuery = async (info) => {
       query = `BatchSegment translation is not supported`
     }
     else {
+      query = query + "; " + "Select * from " + entity + ";"
       query = query.replace("tablename", entity);
     }
     return query
