@@ -120,7 +120,10 @@ exports.GetInsertQuery = async (info) => {
       query = `BatchSegment translation is not supported`
     }
     else {
-      query = query + "; " + "Select * from " + entity + ";"
+      // primary_key = GetKeyFromModel(info.data_model, entity)
+      // key_created = info.body[primary_key]
+      // query = query + "; " + "Select * from " + entity + " WHERE " + primary_key +" = " + key_created +";"
+      //query = query + "; " + "Select * from " + entity +";"
       query = query.replace("tablename", entity);
     }
     return query
@@ -167,7 +170,6 @@ exports.GetUpdateQuery = async (info) => {
 
 exports.GetDeleteQuery = async (info) => {
   try {
-    console.log(info)
     query = 'DELETE FROM tablename';
     full_resource_path = info.resource_path
     //isolating service root and entity name
