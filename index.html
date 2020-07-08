@@ -19,6 +19,38 @@
         <label for="node-input-name">Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
+    <p>To support model specific query generation :</p>
+    <p> set msg.model object to a valid data model using a function node</p>
+
+    <p>Example :</p>
+    <pre>
+{
+    namespace: "ignite",
+    entityTypes: {
+        "users": {
+            "id": {"type": "Edm.Int32", "key": true},
+            "name": {"type": "Edm.String"},            
+            "username": {"type": "Edm.String"}            
+        }
+    },   
+    entitySets: {
+        "users": {
+            entityType: "ignite.users"
+        }
+    }
+}
+    </pre>
+</pre>
+<p>Entity Data Model (EDM) types for OData Version 4.0</p>
+<pre>
+    INTEGER             Edm.Int32
+    VARCHAR             Edm.String
+    BOOLEAN/BIT         Edm.Boolean
+    DOUBLE/FLOAT        Edm.Double
+    DECIMAL             Edm.Decimal
+    DATE                Edm.Date
+    TIMESTAMP           Edm.DateTimeOffset
+</pre>
 </script>
 
 <script type="text/html" data-help-name="odata in">
@@ -55,8 +87,7 @@
         category: 'odata',
         color: '#d24714',
         defaults: {
-            name: { value: "" },
-            modelbox: { value: "false" }
+            name: { value: "" }
         },
         inputs: 1,
         outputs: 1,
@@ -73,10 +104,35 @@
         <label for="node-input-name">Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
-    <div class="form-row">
-        <input type="checkbox" id="node-input-modelbox" value="true" style="display:inline; width:15px; vertical-align:baseline;">
-        <label for="node-input-modelbox" style="display:inline;">Enable metadata</label>
-    </div>
+    <br>
+    <p>To support incoming metadata requests, please provide a data model in the following format</p>
+    <pre>
+{
+    namespace: "ignite",
+    entityTypes: {
+        "users": {
+            "id": {"type": "Edm.Int32", "key": true},
+            "name": {"type": "Edm.String"},            
+            "username": {"type": "Edm.String"}            
+        }
+    },   
+    entitySets: {
+        "users": {
+            entityType: "ignite.users"
+        }
+    }
+}
+    </pre>
+    <p>Entity Data Model (EDM) types for OData Version 4.0</p>
+    <pre>
+        INTEGER             Edm.Int32
+        VARCHAR             Edm.String
+        BOOLEAN/BIT         Edm.Boolean
+        DOUBLE/FLOAT        Edm.Double
+        DECIMAL             Edm.Decimal
+        DATE                Edm.Date
+        TIMESTAMP           Edm.DateTimeOffset
+    </pre>
 </script>
 
 <script type="text/html" data-help-name="odata out">
@@ -90,13 +146,11 @@
         <br>
         3. odata out node will convert the msg.payload into odata compatible format.
         <br>
-        4. To serve the metadata requests the user must provide a data model to the odata out node.
+        4. To serve the metadata requests the user must provide a data model to the odata in node.
         <br>
         5. This can be done by inserting a function node and setting the <i style="color:#AD1625;">msg.model</i> object to a valid data model.
         <br>
-        6. Check the metadata box if you've provided a msg.model object via a fucntion node.
-        <br>
-        7. If the request comes for metadata, the node will return an edmx xml for the model specified by the user.
+        7. If the request comes for metadata, the node will return an edmx xml for the model provided by the user.
         <br>
     </div>
 </script>

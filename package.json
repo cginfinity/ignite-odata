@@ -5,13 +5,14 @@
       "odata": "index.js"
     }
   },
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Odata Connector CG Ignite",
   "main": "index.js",
   "scripts": {},
   "author": {
-    "name": "Ravi-Kaushish",
-    "email": "ravi.sharma@cygrp.com"
+    "name": "Ravi Kant Sharma",
+    "email": "ravi.sharma@cygrp.com",
+    "github": "Ravi-Kaushish"
   },
   "keywords": [
     "CG",
