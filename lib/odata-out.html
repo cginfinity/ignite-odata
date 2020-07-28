@@ -1,0 +1,72 @@
+<script type="text/javascript">
+    RED.nodes.registerType('odata out', {
+        category: 'odata',
+        color: '#d24714',
+        defaults: {
+            name: { value: "" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'font-awesome/fa-angle-double-right',
+        align: 'right',
+        label: function () {
+            return this.name || "odata out";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="odata out">
+    <div class="form-row">
+        <label for="node-input-name">Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <br>
+    <p>To support incoming metadata requests, please provide a data model in the following format</p>
+    <pre>
+{
+    namespace: "ignite",
+    entityTypes: {
+        "users": {
+            "id": {"type": "Edm.Int32", "key": true},
+            "name": {"type": "Edm.String"},            
+            "username": {"type": "Edm.String"}            
+        }
+    },   
+    entitySets: {
+        "users": {
+            entityType: "ignite.users"
+        }
+    }
+}
+    </pre>
+    <p>Entity Data Model (EDM) types for OData Version 4.0</p>
+    <pre>
+        INTEGER             Edm.Int32
+        VARCHAR             Edm.String
+        BOOLEAN/BIT         Edm.Boolean
+        DOUBLE/FLOAT        Edm.Double
+        DECIMAL             Edm.Decimal
+        DATE                Edm.Date
+        TIMESTAMP           Edm.DateTimeOffset
+    </pre>
+</script>
+
+<script type="text/html" data-help-name="odata out">
+    <p style="color:#AD1625; font-weight:bold;">
+        A node that returns an odata compatible response
+    </p>
+    <div>
+        1. Connect the odata out node to any node serving it data in msg.payload.
+        <br>
+        2. The messages sent to this node must originate from an odata in node.
+        <br>
+        3. odata out node will convert the msg.payload into odata compatible format.
+        <br>
+        4. To serve the metadata requests the user must provide a data model to the odata in node.
+        <br>
+        5. This can be done by inserting a function node and setting the <i style="color:#AD1625;">msg.model</i> object to a valid data model.
+        <br>
+        7. If the request comes for metadata, the node will return an edmx xml for the model provided by the user.
+        <br>
+    </div>
+</script>
