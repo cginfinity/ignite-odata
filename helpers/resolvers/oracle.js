@@ -83,10 +83,6 @@ exports.GetSelectQuery = async (info) => {
         if (full_resource_path.includes("(")) {
           entity = getEntity(entity)
         }
-        if (query_params.$top) {
-          limit = `SELECT TOP ${query_params.$top}`
-          query = query.replace("SELECT", limit);
-        }
         if (query_params.$select) {
           query = query.replace("*", query_params.$select);
         }
@@ -95,7 +91,13 @@ exports.GetSelectQuery = async (info) => {
           operand = predicates[0]
           operator = ConvertToOperator(predicates[1])
           value = predicates[2]
-          query = query + " where " + operand + " " + operator + " " + value
+          query = query + " WHERE " + operand + " " + operator + " " + value
+        }
+        if (query_params.$orderby) {
+          query = query + " ORDER BY " + query_params.$orderby;
+        }
+        if (query_params.$top) {
+          query = query + " FETCH FIRST " + query_params.$top +" ROWS ONLY;"
         }
         return query.replace("tablename", entity);
       }

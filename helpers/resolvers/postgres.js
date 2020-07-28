@@ -96,6 +96,9 @@ exports.GetSelectQuery = async (info) => {
         if (query_params.$top) {
           query = query + " LIMIT " + query_params.$top
         }
+        if (query_params.$orderby) {
+          query = query + " ORDER BY " + query_params.$orderby;
+        }
         return query.replace("tablename", entity);
       }
     }

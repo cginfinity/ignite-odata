@@ -97,6 +97,9 @@ exports.GetSelectQuery = async (info) => {
           value = predicates[2]
           query = query + " where " + operand + " " + operator + " " + value
         }
+        if (query_params.$orderby) {
+          query = query + " ORDER BY " + query_params.$orderby;
+        }
         return query.replace("tablename", entity);
       }
     }
