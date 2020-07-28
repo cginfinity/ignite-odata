@@ -96,8 +96,17 @@ exports.GetSelectQuery = async (info) => {
         if (query_params.$orderby) {
           query = query + " ORDER BY " + query_params.$orderby;
         }
+        if (query_params.$skip) {
+          if (query_params.$orderby) {
+            query = query + " OFFSET " + query_params.$skip + " ROWS"
+          }
+          else {
+            primary_key = GetKeyFromModel(info.data_model, entity)
+            query = query + " ORDER BY " + primary_key + " OFFSET " + query_params.$skip + " ROWS "
+          }
+        }
         if (query_params.$top) {
-          query = query + " FETCH FIRST " + query_params.$top +" ROWS ONLY;"
+          query = query + " FETCH NEXT " + query_params.$top + " ROWS ONLY "
         }
         return query.replace("tablename", entity);
       }

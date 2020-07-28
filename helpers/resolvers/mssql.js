@@ -98,7 +98,7 @@ exports.GetSelectQuery = async (info) => {
         }
         if (query_params.$skip) {
           if (query_params.$orderby) {
-            query = query + " OFFSET " + query_params.$skip + " ROWS "
+            query = query + " OFFSET " + query_params.$skip + " ROWS"
           }
           else {
             primary_key = GetKeyFromModel(info.data_model, entity)
