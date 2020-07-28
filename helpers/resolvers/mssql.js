@@ -93,26 +93,35 @@ exports.GetSelectQuery = async (info) => {
           value = predicates[2]
           query = query + " WHERE " + operand + " " + operator + " " + value
         }
+        orderbyadded = false
         if (query_params.$orderby) {
           query = query + " ORDER BY " + query_params.$orderby;
+          orderbyadded = true
         }
         if (query_params.$skip) {
-          if (query_params.$orderby) {
+          if (orderbyadded === true) {
             query = query + " OFFSET " + query_params.$skip + " ROWS"
           }
           else {
             primary_key = GetKeyFromModel(info.data_model, entity)
-            query = query + " ORDER BY " + primary_key + " OFFSET " + query_params.$skip + " ROWS "
+            query = query + " ORDER BY " + primary_key + " OFFSET " + query_params.$skip + " ROWS"
+            orderbyadded = true
           }
         }
-        if (query_params.$skip && query_params.$top) {
-          query = query + " FETCH NEXT " + query_params.$top + " ROWS ONLY "
-          var includetop = false
+        if (query_params.$top && query_params.$skip) {
+          if (orderbyadded === true) {
+            query = query + " FETCH NEXT " + query_params.$top + " ROWS ONLY "
+          }
+          else {
+            primary_key = GetKeyFromModel(info.data_model, entity)
+            query = query + " ORDER BY " + primary_key + " FETCH NEXT " + query_params.$top + " ROWS ONLY"
+            orderbyadded = true
+          }
         }
-        if (query_params.$top && includetop !== false) {
+        if (query_params.$top && !query_params.$skip) {
           limit = `SELECT TOP ${query_params.$top}`
           query = query.replace("SELECT", limit);
-          if (!query_params.$orderby) {
+          if (orderbyadded !== true) {
             primary_key = GetKeyFromModel(info.data_model, entity)
             query = query + " ORDER BY " + primary_key
           }

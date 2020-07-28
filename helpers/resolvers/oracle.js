@@ -93,28 +93,30 @@ exports.GetSelectQuery = async (info) => {
           value = predicates[2]
           query = query + " WHERE " + operand + " " + operator + " " + value
         }
+        orderbyadded = false
         if (query_params.$orderby) {
           query = query + " ORDER BY " + query_params.$orderby;
+          orderbyadded = true
         }
         if (query_params.$skip) {
-          if (query_params.$orderby) {
+          if (orderbyadded === true) {
             query = query + " OFFSET " + query_params.$skip + " ROWS"
           }
           else {
             primary_key = GetKeyFromModel(info.data_model, entity)
-            query = query + " ORDER BY " + primary_key + " OFFSET " + query_params.$skip + " ROWS "
+            query = query + " ORDER BY " + primary_key + " OFFSET " + query_params.$skip + " ROWS"
+            orderbyadded = true
           }
         }
         if (query_params.$top) {
-          //query = query + " FETCH NEXT " + query_params.$top + " ROWS ONLY "
-          if (query_params.$orderby) {
-            query = query + " FETCH NEXT " + query_params.$top + " ROWS ONLY "
+          if (orderbyadded === true) {
+            query = query + " FETCH NEXT " + query_params.$top + " ROWS ONLY"
           }
           else {
             primary_key = GetKeyFromModel(info.data_model, entity)
-            query = query + " ORDER BY " + primary_key + " FETCH NEXT " + query_params.$top + " ROWS ONLY "
+            query = query + " ORDER BY " + primary_key + " FETCH NEXT " + query_params.$top + " ROWS ONLY"
+            orderbyadded = true
           }
-
         }
         return query.replace("tablename", entity);
       }
