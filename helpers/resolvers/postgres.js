@@ -104,7 +104,7 @@ exports.GetSelectQuery = async (info) => {
           }
           else {
             primary_key = GetKeyFromModel(info.data_model, entity)
-            query = query + " ORDER BY " + primary_key + " OFFSET " + query_params.$top
+            query = query + " ORDER BY " + primary_key + " OFFSET " + query_params.$skip
             orderbyadded = true
           }
         }
