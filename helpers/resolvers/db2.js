@@ -91,7 +91,7 @@ exports.GetSelectQuery = async (info) => {
           operand = predicates[0]
           operator = ConvertToOperator(predicates[1])
           value = predicates[2]
-          query = query + " where " + operand + " " + operator + " " + value
+          query = query + " WHERE " + operand + " " + operator + " " + value
         }
         if (query_params.$top) {
           query = query + " LIMIT " + query_params.$top

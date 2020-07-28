@@ -1,8 +1,8 @@
 const { GetUpdateSetColumns,
-        GetInsertionColumnsAndValues,
-        GetMetadataQuery,
-        GetKeyFromModel
-      } = require('../sql');
+  GetInsertionColumnsAndValues,
+  GetMetadataQuery,
+  GetKeyFromModel
+} = require('../sql');
 const { ConvertToOperator } = require('../operators');
 const { isEmpty, getEntity } = require('../functions');
 
@@ -80,12 +80,8 @@ exports.GetSelectQuery = async (info) => {
         //case for find by id
         query = 'SELECT * FROM tablename';
         //to counter user error where user appends user(id) with query parameters
-        if(full_resource_path.includes("(")){
-          entity= getEntity(entity)
-        }
-        if (query_params.$top) {
-          limit = `SELECT TOP ${query_params.$top}`
-          query = query.replace("SELECT", limit);
+        if (full_resource_path.includes("(")) {
+          entity = getEntity(entity)
         }
         if (query_params.$select) {
           query = query.replace("*", query_params.$select);
@@ -95,10 +91,27 @@ exports.GetSelectQuery = async (info) => {
           operand = predicates[0]
           operator = ConvertToOperator(predicates[1])
           value = predicates[2]
-          query = query + " where " + operand + " " + operator + " " + value
+          query = query + " WHERE " + operand + " " + operator + " " + value
         }
         if (query_params.$orderby) {
           query = query + " ORDER BY " + query_params.$orderby;
+        }
+        if (query_params.$skip) {
+          if (query_params.$orderby) {
+            query = query + " OFFSET " + query_params.$skip + " ROWS "
+          }
+          else {
+            primary_key = GetKeyFromModel(info.data_model, entity)
+            query = query + " ORDER BY " + primary_key + " OFFSET " + query_params.$skip + " ROWS "
+          }
+        }
+        if (query_params.$skip && query_params.$top) {
+          query = query + " FETCH NEXT " + query_params.$top + " ROWS ONLY "
+          var includetop = false
+        }
+        if (query_params.$top && includetop !== false) {
+          limit = `SELECT TOP ${query_params.$top}`
+          query = query.replace("SELECT", limit);
         }
         return query.replace("tablename", entity);
       }
@@ -159,7 +172,7 @@ exports.GetUpdateQuery = async (info) => {
         primary_key = GetKeyFromModel(info.data_model, entity)
         query = query + primary_key + " = " + param
         return query.replace("tablename", entity);
-      }else{
+      } else {
         return query.replace("tablename", entity);
       }
     }
@@ -194,7 +207,7 @@ exports.GetDeleteQuery = async (info) => {
         primary_key = GetKeyFromModel(info.data_model, entity)
         query = query + primary_key + " = " + param
         return query.replace("tablename", entity);
-      }else{
+      } else {
         return query.replace("tablename", entity);
       }
     }
