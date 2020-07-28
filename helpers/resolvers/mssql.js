@@ -112,6 +112,10 @@ exports.GetSelectQuery = async (info) => {
         if (query_params.$top && includetop !== false) {
           limit = `SELECT TOP ${query_params.$top}`
           query = query.replace("SELECT", limit);
+          if (!query_params.$orderby) {
+            primary_key = GetKeyFromModel(info.data_model, entity)
+            query = query + " ORDER BY " + primary_key
+          }
         }
         return query.replace("tablename", entity);
       }
