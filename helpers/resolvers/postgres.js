@@ -98,16 +98,6 @@ exports.GetSelectQuery = async (info) => {
           query = query + " ORDER BY " + query_params.$orderby;
           orderbyadded = true
         }
-        if (query_params.$skip) {
-          if (orderbyadded === true) {
-            query = query + " OFFSET " + query_params.$skip
-          }
-          else {
-            primary_key = GetKeyFromModel(info.data_model, entity)
-            query = query + " ORDER BY " + primary_key + " OFFSET " + query_params.$skip
-            orderbyadded = true
-          }
-        }
         if (query_params.$top) {
           if (orderbyadded === true) {
             query = query + " LIMIT " + query_params.$top
@@ -115,6 +105,16 @@ exports.GetSelectQuery = async (info) => {
           else {
             primary_key = GetKeyFromModel(info.data_model, entity)
             query = query + " ORDER BY " + primary_key + " LIMIT " + query_params.$top
+            orderbyadded = true
+          }
+        }
+        if (query_params.$skip) {
+          if (orderbyadded === true) {
+            query = query + " OFFSET " + query_params.$skip
+          }
+          else {
+            primary_key = GetKeyFromModel(info.data_model, entity)
+            query = query + " ORDER BY " + primary_key + " OFFSET " + query_params.$skip
             orderbyadded = true
           }
         }

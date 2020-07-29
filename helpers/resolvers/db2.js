@@ -93,11 +93,30 @@ exports.GetSelectQuery = async (info) => {
           value = predicates[2]
           query = query + " WHERE " + operand + " " + operator + " " + value
         }
-        if (query_params.$top) {
-          query = query + " LIMIT " + query_params.$top
-        }
+        orderbyadded = false
         if (query_params.$orderby) {
           query = query + " ORDER BY " + query_params.$orderby;
+          orderbyadded = true
+        }
+        if (query_params.$top) {
+          if (orderbyadded === true) {
+            query = query + " LIMIT " + query_params.$top
+          }
+          else {
+            primary_key = GetKeyFromModel(info.data_model, entity)
+            query = query + " ORDER BY " + primary_key + " LIMIT " + query_params.$top
+            orderbyadded = true
+          }
+        }
+        if (query_params.$skip) {
+          if (orderbyadded === true) {
+            query = query + " OFFSET " + query_params.$skip
+          }
+          else {
+            primary_key = GetKeyFromModel(info.data_model, entity)
+            query = query + " ORDER BY " + primary_key + " OFFSET " + query_params.$skip
+            orderbyadded = true
+          }
         }
         return query.replace("tablename", entity);
       }
