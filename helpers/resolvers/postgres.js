@@ -171,7 +171,7 @@ exports.GetUpdateQuery = async (info) => {
     }
     else {
       //checking for param in parenthesis (key)
-      if (full_resource_path.includes("(")) {
+      if (full_resource_path.includes("(") && full_resource_path.includes(")")) {
         entity_with_param = entity
         entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
         entity_with_param = entity_with_param.split('(');
@@ -182,7 +182,7 @@ exports.GetUpdateQuery = async (info) => {
         query = query + primary_key + " = " + param
         return query.replace("tablename", entity);
       } else {
-        return query.replace("tablename", entity);
+        return "SELECT * FROM " + entity;
       }
     }
   } catch (error) {
@@ -206,7 +206,7 @@ exports.GetDeleteQuery = async (info) => {
     }
     else {
       //checking for param in parenthesis 
-      if (full_resource_path.includes("(")) {
+      if (full_resource_path.includes("(") && full_resource_path.includes(")")) {
         entity_with_param = entity
         entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
         entity_with_param = entity_with_param.split('(');
@@ -217,7 +217,7 @@ exports.GetDeleteQuery = async (info) => {
         query = query + primary_key + " = " + param
         return query.replace("tablename", entity);
       } else {
-        return query.replace("tablename", entity);
+        return "SELECT * FROM " + entity;
       }
     }
   } catch (error) {
