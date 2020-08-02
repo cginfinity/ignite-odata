@@ -1,0 +1,72 @@
+<script type="text/javascript">
+    RED.nodes.registerType('odata client', {
+        category: 'odata',
+        color: '#d24714',
+        defaults: {
+            name: { value: "" },
+            method: { value: "GET" },
+            rootURL: { value: "" },
+            resource: { value: "$metadata" },
+            querytop: { value: "" },
+            queryskip: { value: "" },
+            queryfilter: { value: "" },
+            queryorderby: { value: "" },
+            queryselect: { value: "" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'font-awesome/fa-paper-plane-o',
+        label: function () {
+            return this.name || "odata client";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="odata client">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name </label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-method"><i class="fa fa-tasks"></i><span> Method </span></label>
+        <select type="select" id="node-input-method">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="PATCH">PATCH</option>
+            <option value="DELETE">DELETE</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-rootURL"><i class="fa fa-sitemap"></i> Service Root Url</label>
+        <input type="text" id="node-input-rootURL" placeholder="http://my-serviceroot.url/">
+    </div>
+    <div class="form-row">
+        <label for="node-input-resource"><i class="fa fa-sitemap"></i> Resource : </label>
+        <input type="text" id="node-input-resource" placeholder="Users or Users('Ravi')">
+    </div>
+    <div class="form-row">
+        <label for="node-input-querytop"><i class="fa fa-sitemap"></i> $top = </label>
+        <input type="text" id="node-input-querytop" placeholder="$top = 10">
+    </div>
+    <div class="form-row">
+        <label for="node-input-queryskip"><i class="fa fa-sitemap"></i> $skip = </label>
+        <input type="text" id="node-input-queryskip" placeholder="$skip = 5">
+    </div>
+    <div class="form-row">
+        <label for="node-input-queryfilter"><i class="fa fa-sitemap"></i> $filter = </label>
+        <input type="text" id="node-input-queryfilter" placeholder="$filter = FirstName eq 'Ravi'">
+    </div>
+    <div class="form-row">
+        <label for="node-input-queryselect"><i class="fa fa-sitemap"></i> $select = </label>
+        <input type="text" id="node-input-queryselect" placeholder="$select = Name, Email">
+    </div>
+    <div class="form-row">
+        <label for="node-input-queryorderby"><i class="fa fa-sitemap"></i> $orderby = </label>
+        <input type="text" id="node-input-queryorderby" placeholder="$orderby = Email">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="odata client">
+    <p>A node that helps you consume odata complaint api</p>
+</script>
