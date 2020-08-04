@@ -11,7 +11,9 @@
             queryskip: { value: "" },
             queryfilter: { value: "" },
             queryorderby: { value: "" },
-            queryselect: { value: "" }
+            queryselect: { value: "" },
+            querycount: { value: "" },
+            querysearch: { value: "" },
         },
         inputs: 1,
         outputs: 1,
@@ -38,7 +40,7 @@
         </select>
     </div>
     <div class="form-row">
-        <label for="node-input-rootURL"><i class="fa fa-sitemap"></i> Service Root Url</label>
+        <label for="node-input-rootURL"><i class="fa fa-sitemap"></i> Root URL</label>
         <input type="text" id="node-input-rootURL" placeholder="http://my-serviceroot.url/">
     </div>
     <div class="form-row">
@@ -54,16 +56,24 @@
         <input type="text" id="node-input-queryskip" placeholder="$skip = 5">
     </div>
     <div class="form-row">
-        <label for="node-input-queryfilter"><i class="fa fa-sitemap"></i> $filter = </label>
-        <input type="text" id="node-input-queryfilter" placeholder="$filter = FirstName eq 'Ravi'">
+        <label for="node-input-queryorderby"><i class="fa fa-sitemap"></i> $orderby = </label>
+        <input type="text" id="node-input-queryorderby" placeholder="$orderby = Email">
     </div>
     <div class="form-row">
         <label for="node-input-queryselect"><i class="fa fa-sitemap"></i> $select = </label>
         <input type="text" id="node-input-queryselect" placeholder="$select = Name, Email">
     </div>
     <div class="form-row">
-        <label for="node-input-queryorderby"><i class="fa fa-sitemap"></i> $orderby = </label>
-        <input type="text" id="node-input-queryorderby" placeholder="$orderby = Email">
+        <label for="node-input-queryfilter"><i class="fa fa-sitemap"></i> $filter = </label>
+        <input type="text" id="node-input-queryfilter" placeholder="$filter = FirstName eq 'Ravi'">
+    </div>
+    <div class="form-row">
+        <label for="node-input-querycount"><i class="fa fa-sitemap"></i> $count = </label>
+        <input type="text" id="node-input-querycount" placeholder="$count = true">
+    </div>
+    <div class="form-row">
+        <label for="node-input-querysearch"><i class="fa fa-sitemap"></i> $search = </label>
+        <input type="text" id="node-input-querysearch" placeholder="$search = Cyber Gorup">
     </div>
 </script>
 
