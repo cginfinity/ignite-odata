@@ -1,9 +1,9 @@
 const { GetUpdateSetColumns,
   GetInsertionColumnsAndValues,
   GetMetadataQuery,
-  GetKeyFromModel
+  GetKeyFromModel,
+  GetFilterQueryString
 } = require('../sql');
-const { ConvertToOperator } = require('../operators');
 const { isEmpty, getEntity } = require('../functions');
 
 // returns a mysql query based on url, method, req. body and parameters
@@ -88,10 +88,12 @@ exports.GetSelectQuery = async (info) => {
         }
         if (query_params.$filter) {
           predicates = query_params.$filter.split(' ');
-          operand = predicates[0]
-          operator = ConvertToOperator(predicates[1])
-          value = predicates[2]
-          query = query + " WHERE " + operand + " " + operator + " " + value
+          // operand = predicates[0]
+          // operator = ConvertToOperator(predicates[1])
+          // value = predicates[2]
+          // query = query + " WHERE " + operand + " " + operator + " " + value
+          filterString = GetFilterQueryString(predicates)
+          query = query + " WHERE " + filterString
         }
         orderbyadded = false
         if (query_params.$orderby) {

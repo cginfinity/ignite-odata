@@ -1,3 +1,5 @@
+const { ConvertToOperator } = require('./operators');
+
 // returns the columns and values for the insert query
 exports.GetInsertionColumnsAndValues = (data) => {
   var columns = "",
@@ -108,6 +110,24 @@ exports.GetKeyFromModel = (model, tableName) => {
       }
     };
   }
+};
+
+// returns the primary key from and edmx (json object model)
+exports.GetFilterQueryString = (predicates) => {
+  filterString = ''
+  for (i = 0; i < predicates.length; i++) {
+    filterString = filterString + predicates[i] + " " + ConvertToOperator(predicates[i + 1]) + " " //+ predicates[i + 2]
+    if (predicates[i + 2].substring(0, 1) == "'"){
+      filterString = filterString + predicates[i + 2]
+    }else {
+      filterString = filterString + "'" + predicates[i + 2] + "'"
+    }
+    if (predicates[i + 3]) {
+      filterString = filterString + " " + predicates[i + 3] + " "
+    }
+    i = i + 3
+  }
+  return filterString
 };
 
 // returns the set conditions for the update query
