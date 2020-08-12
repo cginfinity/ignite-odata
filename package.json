@@ -4,10 +4,12 @@
     "nodes": {
       "odata in": "lib/odata-in.js",
       "odata out": "lib/odata-out.js",
-      "odata client": "lib/odata-client.js"
+      "odata client": "lib/odata-client.js",
+      "entity": "lib/entity.js",
+      "edm": "lib/edm.js"
     }
   },
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Odata Connector CG Ignite",
   "scripts": {},
   "author": {
