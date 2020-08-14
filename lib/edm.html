@@ -1,0 +1,131 @@
+<script type="text/javascript" >
+    var _maxModel = 20;
+    RED.nodes.registerType('edm',{
+        category: 'config',
+        defaults: {
+            namespace: {value:"ignite",required:true},
+            entities: { type:"entity", required: false },
+            model1: { type:"hidden", required: false},
+            model2: { type:"hidden", required: false},
+            model3: { type:"hidden", required: false},
+            model4: { type:"hidden", required: false},
+            model5: { type:"hidden", required: false},
+            model6: { type:"hidden", required: false},
+            model7: { type:"hidden", required: false},
+            model8: { type:"hidden", required: false},
+            model9: { type:"hidden", required: false},
+            model10: { type:"hidden", required: false},
+            model11: { type:"hidden", required: false},
+            model12: { type:"hidden", required: false},
+            model13: { type:"hidden", required: false},
+            model14: { type:"hidden", required: false},
+            model15: { type:"hidden", required: false},
+            model16: { type:"hidden", required: false},
+            model17: { type:"hidden", required: false},
+            model18: { type:"hidden", required: false},
+            model19: { type:"hidden", required: false},
+            model20: { type:"hidden", required: false},
+        },
+        label: function() {
+            return "edm:"+ this.namespace;
+        },
+        oneditprepare: function() {
+            var node = this;
+            var model = [];
+            for (var index = 1; index <= _maxModel; index++) {
+                if(this["model" + index])
+                {
+                    model.push(this["model" + index]);
+                }
+            }
+            this._resize = function() {
+                var rows = $("#node-config-dialog-edit-form>div:not(.node-input-target-list-row)");
+                var height = $("#node-config-dialog-edit-form").height();
+                for (var i=0;i<rows.length;i++) {
+                    height -= $(rows[i]).outerHeight(true);
+                }
+                var editorRow = $("#node-config-dialog-edit-form>div.node-input-target-list-row");
+                editorRow.css("height",height+"px");
+            };
+            var dirList = $("#node-input-edm-target-container-div").css({width: "100%", height: "100%"})
+                .treeList({multi:true}).on("treelistitemmouseover", function(e, item) {
+                    
+                }).on("treelistitemmouseout", function(e, item) {
+                });
+
+                
+                $("#node-config-input-entities").on("change", function(e, item) {
+                    var items = [];
+                    var nodeItemMap = {};
+                    RED.nodes.eachConfig(function(n) {
+                        if(n.type == "entity"){
+                            var isChecked = model.indexOf(n.id) !== -1;
+
+                            nodeItemMap[n.id] = {
+                                node: n,
+                                label: n.name,
+                                sublabel: n.type,
+                                selected: isChecked
+                            };
+                            items.push(nodeItemMap[n.id]);
+                        }
+                    });
+                
+                    dirList.treeList('data',items);
+                });
+                
+        },
+        oneditsave: function(){
+            var model = $("#node-input-edm-target-container-div").treeList('selected').map(function(i) { return i.node.id});
+            for (var index = 1; index <= _maxModel; index++) {
+                if(index <= model.length){
+                    $("#node-config-input-model" + index).val(model[index - 1]);
+                }
+                else
+                {
+                    $("#node-config-input-model" + index).val("_ADD_");
+                }  
+            }
+            $("#node-config-input-entities").val("_ADD_");
+        },
+        oneditresize: function(size) {
+            this._resize();
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="edm">
+    <div class="form-row">
+        <label for="node-config-input-namespace"><i class="fa fa-bookmark"></i> Namespace</label>
+        <input type="text" id="node-config-input-namespace">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-entities"><i class="fa fa-bookmark"></i> Entity</label>
+        <input type="text" id="node-config-input-entities">
+    </div>
+    <div class="form-row node-input-target-row node-input-target-list-row" style="min-height: 100px">
+        <div id="node-input-edm-target-container-div"></div>
+    </div>
+    <div style='display:none;height:0'>
+        <input type="hidden" id="node-config-input-model1">
+        <input type="hidden" id="node-config-input-model2">
+        <input type="hidden" id="node-config-input-model3">
+        <input type="hidden" id="node-config-input-model4">
+        <input type="hidden" id="node-config-input-model5">
+        <input type="hidden" id="node-config-input-model6">
+        <input type="hidden" id="node-config-input-model7">
+        <input type="hidden" id="node-config-input-model8">
+        <input type="hidden" id="node-config-input-model9">
+        <input type="hidden" id="node-config-input-model10">
+        <input type="hidden" id="node-config-input-model11">
+        <input type="hidden" id="node-config-input-model12">
+        <input type="hidden" id="node-config-input-model13">
+        <input type="hidden" id="node-config-input-model14">
+        <input type="hidden" id="node-config-input-model15">
+        <input type="hidden" id="node-config-input-model16">
+        <input type="hidden" id="node-config-input-model17">
+        <input type="hidden" id="node-config-input-model18">
+        <input type="hidden" id="node-config-input-model19">
+        <input type="hidden" id="node-config-input-model20">
+    </div>
+</script>

@@ -3,7 +3,8 @@
         category: 'odata',
         color: '#d24714',
         defaults: {
-            name: { value: "" }
+            name: { value: "" },
+            edm: { type:"edm", required: false },
         },
         inputs: 1,
         outputs: 1,
@@ -18,6 +19,10 @@
     <div class="form-row">
         <label for="node-input-name">Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-edm">Edm</label>
+        <input type="text" id="node-input-edm" placeholder="Entity Data Model">
     </div>
     <p>To support model specific query generation :</p>
     <p> set msg.model object to a valid data model using a function node</p>
