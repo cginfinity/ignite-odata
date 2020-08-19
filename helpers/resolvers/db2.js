@@ -184,6 +184,7 @@ exports.GetUpdateQuery = async (info) => {
         info.schema ? entity = info.schema + '.' + entity : entity
         return query.replace("tablename", entity);
       }else{
+        info.schema ? entity = info.schema + '.' + entity : entity;
         return "SELECT * FROM " + entity;
       }
     }
@@ -220,6 +221,7 @@ exports.GetDeleteQuery = async (info) => {
         info.schema ? entity = info.schema + '.' + entity : entity
         return query.replace("tablename", entity);
       }else{
+        info.schema ? entity = info.schema + '.' + entity : entity;
         return "SELECT * FROM " + entity;
       }
     }
