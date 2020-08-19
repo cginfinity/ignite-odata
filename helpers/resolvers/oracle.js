@@ -75,6 +75,9 @@ exports.GetSelectQuery = async (info) => {
         if (properties) {
           query = query.replace("*", properties);
         }
+        if(info.schema){
+          entity = info.schema + '.' + entity
+        }
         return query.replace("tablename", entity);
       } else {
         //case for find by id 
@@ -120,6 +123,9 @@ exports.GetSelectQuery = async (info) => {
             orderbyadded = true
           }
         }
+        if(info.schema){
+          entity = info.schema + '.' + entity
+        }
         return query.replace("tablename", entity);
       }
     }
@@ -144,6 +150,9 @@ exports.GetInsertQuery = async (info) => {
       query = `BatchSegment translation is not supported`
     }
     else {
+      if(info.schema){
+        entity = info.schema + '.' + entity
+      }
       query = query.replace("tablename", entity);
     }
     return query
@@ -178,6 +187,9 @@ exports.GetUpdateQuery = async (info) => {
         query = query + " WHERE "
         primary_key = GetKeyFromModel(info.data_model, entity)
         query = query + primary_key + " = " + param
+        if(info.schema){
+          entity = info.schema + '.' + entity
+        }
         return query.replace("tablename", entity);
       }else{
         return "SELECT * FROM " + entity;
@@ -213,6 +225,9 @@ exports.GetDeleteQuery = async (info) => {
         query = query + " WHERE "
         primary_key = GetKeyFromModel(info.data_model, entity)
         query = query + primary_key + " = " + param
+        if(info.schema){
+          entity = info.schema + '.' + entity
+        }
         return query.replace("tablename", entity);
       }else{
         return "SELECT * FROM " + entity;
