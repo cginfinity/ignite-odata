@@ -4,6 +4,7 @@
         category: 'config',
         defaults: {
             namespace: {value:"ignite",required:true},
+            schema: { required: false },
             entities: { type:"entity", required: false },
             model1: { type:"hidden", required: false},
             model2: { type:"hidden", required: false},
@@ -98,6 +99,10 @@
     <div class="form-row">
         <label for="node-config-input-namespace"><i class="fa fa-bookmark"></i> Namespace</label>
         <input type="text" id="node-config-input-namespace">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-schema"><i class="fa fa-bookmark"></i> Schema</label>
+        <input type="text" id="node-config-input-schema">
     </div>
     <div class="form-row">
         <label for="node-config-input-entities"><i class="fa fa-bookmark"></i> Entity</label>

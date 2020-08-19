@@ -1,6 +1,4 @@
-const { GetUpdateSetColumns,
-  GetInsertionColumnsAndValues,
-  GetMetadataQuery,
+const { GetMetadataQuery,
   GetKeyFromModel,
   GetFilterQueryString
 } = require('../sql');
@@ -12,17 +10,8 @@ exports.GetQuery = async (info) => {
     if (info.method === 'GET') {
       return await this.GetSelectQuery(info)
     }
-    else if (info.method === 'POST' && info.headers['x-http-method'] == "PATCH") {
-      return await this.GetUpdateQuery(info)
-    }
-    else if (info.method === 'POST') {
-      return await this.GetInsertQuery(info)
-    }
-    else if (info.method === 'PUT' || info.method === 'PATCH') {
-      return await this.GetUpdateQuery(info)
-    }
-    else if (info.method === 'DELETE') {
-      return await this.GetDeleteQuery(info)
+    else {
+      return "S3 doesn't allow data updates using sql"
     }
   } catch (err) {
     return err;
@@ -114,106 +103,6 @@ exports.GetSelectQuery = async (info) => {
         }
         info.schema ? entity = info.schema + '.' + entity : entity;
         return query.replace("tablename", entity);
-      }
-    }
-  } catch (error) {
-    return error;
-  }
-};
-
-exports.GetInsertQuery = async (info) => {
-  try {
-    const data = GetInsertionColumnsAndValues(info.body);
-    query = `INSERT INTO tablename(${data.columns}) VALUES (${data.Values})`
-    full_resource_path = info.resource_path
-    //isolating service root and entity name
-    resource_path = full_resource_path.split('/');
-    entity = resource_path[2]
-    properties = resource_path[3]
-    if (entity === '$metadata' || entity === '') {
-      return query = GetMetadataQuery();
-    }
-    else if (entity === '$batch') {
-      query = `BatchSegment translation is not supported`
-    }
-    else {
-      info.schema ? entity = info.schema + '.' + entity : entity;
-      query = query.replace("tablename", entity);
-    }
-    return query
-  } catch (error) {
-    return error;
-  }
-};
-
-exports.GetUpdateQuery = async (info) => {
-  try {
-    const setConditions = GetUpdateSetColumns(info.body);
-    query = `UPDATE tablename SET ${setConditions}`;
-    full_resource_path = info.resource_path
-    //isolating service root and entity name
-    resource_path = full_resource_path.split('/');
-    entity = resource_path[2]
-    properties = resource_path[3]
-    if (entity === '$metadata' || entity === '') {
-      return query = GetMetadataQuery();
-    }
-    else if (entity === '$batch') {
-      query = `BatchSegment translation is not supported`
-    }
-    else {
-      //checking for param in parenthesis (key)
-      if (full_resource_path.includes("(") && full_resource_path.includes(")")) {
-        entity_with_param = entity
-        entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
-        entity_with_param = entity_with_param.split('(');
-        entity = entity_with_param[0]
-        param = entity_with_param[1]
-        query = query + " WHERE "
-        primary_key = GetKeyFromModel(info.data_model, entity)
-        query = query + primary_key + " = " + param
-        info.schema ? entity = info.schema + '.' + entity : entity;
-        return query.replace("tablename", entity);
-      } else {
-        info.schema ? entity = info.schema + '.' + entity : entity;
-        return "SELECT * FROM " + entity;
-      }
-    }
-  } catch (error) {
-    return error;
-  }
-};
-
-exports.GetDeleteQuery = async (info) => {
-  try {
-    query = 'DELETE FROM tablename';
-    full_resource_path = info.resource_path
-    //isolating service root and entity name
-    resource_path = full_resource_path.split('/');
-    entity = resource_path[2]
-    properties = resource_path[3]
-    if (entity === '$metadata' || entity === '') {
-      return query = GetMetadataQuery();
-    }
-    else if (entity === '$batch') {
-      return query = `BatchSegment translation is not supported`
-    }
-    else {
-      //checking for param in parenthesis 
-      if (full_resource_path.includes("(") && full_resource_path.includes(")")) {
-        entity_with_param = entity
-        entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
-        entity_with_param = entity_with_param.split('(');
-        entity = entity_with_param[0]
-        param = entity_with_param[1]
-        query = query + " WHERE "
-        primary_key = GetKeyFromModel(info.data_model, entity)
-        query = query + primary_key + " = " + param
-        info.schema ? entity = info.schema + '.' + entity : entity;
-        return query.replace("tablename", entity);
-      } else {        
-        info.schema ? entity = info.schema + '.' + entity : entity;
-        return "SELECT * FROM " + entity;
       }
     }
   } catch (error) {

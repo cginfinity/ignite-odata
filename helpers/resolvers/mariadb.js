@@ -72,26 +72,18 @@ exports.GetSelectQuery = async (info) => {
         query = query + " WHERE "
         primary_key = GetKeyFromModel(info.data_model, entity)
         query = query + primary_key + " = " + param
-        if (properties) {
-          query = query.replace("*", properties);
-        }
+        properties ? query = query.replace("*", properties) : query;
+        info.schema ? entity = info.schema + '.' + entity : entity
         return query.replace("tablename", entity);
       } else {
         //case for find by id 
         query = 'SELECT * FROM tablename';
         //to counter user error where user appends user(id) with query parameters
-        if (full_resource_path.includes("(")) {
-          entity = getEntity(entity)
-        }
-        if (query_params.$select) {
-          query = query.replace("*", query_params.$select);
-        }
+        full_resource_path.includes("(") ? entity = getEntity(entity) : entity;
+        //TO add columns name to select staements
+        query_params.$select ? query = query.replace("*", query_params.$select) : query;
         if (query_params.$filter) {
           predicates = query_params.$filter.split(' ');
-          // operand = predicates[0]
-          // operator = ConvertToOperator(predicates[1])
-          // value = predicates[2]
-          // query = query + " WHERE " + operand + " " + operator + " " + value
           filterString = GetFilterQueryString(predicates)
           query = query + " WHERE " + filterString
         }
@@ -120,6 +112,7 @@ exports.GetSelectQuery = async (info) => {
             orderbyadded = true
           }
         }
+        info.schema ? entity = info.schema + '.' + entity : entity
         return query.replace("tablename", entity);
       }
     }
@@ -144,6 +137,7 @@ exports.GetInsertQuery = async (info) => {
       query = `BatchSegment translation is not supported`
     }
     else {
+      info.schema ? entity = info.schema + '.' + entity : entity
       query = query.replace("tablename", entity);
     }
     return query
@@ -178,8 +172,10 @@ exports.GetUpdateQuery = async (info) => {
         query = query + " WHERE "
         primary_key = GetKeyFromModel(info.data_model, entity)
         query = query + primary_key + " = " + param
+        info.schema ? entity = info.schema + '.' + entity : entity
         return query.replace("tablename", entity);
       } else {
+        info.schema ? entity = info.schema + '.' + entity : entity;
         return "SELECT * FROM " + entity;
       }
     }
@@ -213,8 +209,10 @@ exports.GetDeleteQuery = async (info) => {
         query = query + " WHERE "
         primary_key = GetKeyFromModel(info.data_model, entity)
         query = query + primary_key + " = " + param
+        info.schema ? entity = info.schema + '.' + entity : entity
         return query.replace("tablename", entity);
       } else {
+        info.schema ? entity = info.schema + '.' + entity : entity;
         return "SELECT * FROM " + entity;
       }
     }
