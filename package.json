@@ -9,7 +9,7 @@
       "edm": "lib/edm.js"
     }
   },
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "Odata Connector CG Ignite",
   "scripts": {},
   "author": {
