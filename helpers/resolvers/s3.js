@@ -2,7 +2,7 @@ const { GetMetadataQuery,
   GetKeyFromModel,
   GetFilterQueryString
 } = require('../sql');
-const { isEmpty, getEntity } = require('../functions');
+const { isEmpty, GetEntity } = require('../functions');
 
 // returns a mysql query based on url, method, req. body and parameters
 exports.GetQuery = async (info) => {
@@ -68,7 +68,7 @@ exports.GetSelectQuery = async (info) => {
         //case for find by id 
         query = 'SELECT * FROM tablename';
         //to counter user error where user appends user(id) with query parameters
-        full_resource_path.includes("(") ? entity = getEntity(entity) : entity;
+        full_resource_path.includes("(") ? entity = GetEntity(entity) : entity;
         //TO add columns name to select staements
         query_params.$select ? query = query.replace("*", query_params.$select) : query;
         if (query_params.$filter) {

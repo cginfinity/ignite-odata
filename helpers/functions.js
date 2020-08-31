@@ -8,7 +8,7 @@ exports.isEmpty = (obj) => {
 };
 
 // returns entity by removing additional attached strings
-exports.getEntity = (entity) => {
+exports.GetEntity = (entity) => {
     entity_with_param = entity.split('(');
     return entity_with_param[0];
 };
