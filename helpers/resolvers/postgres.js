@@ -4,7 +4,7 @@ const { GetUpdateSetColumns,
   GetKeyFromModel,
   GetFilterQueryString
 } = require('../sql');
-const { isEmpty, GetEntity, GetPostgresColumNames } = require('../functions');
+const { isEmpty, GetEntity, GetCaseSensitiveNames } = require('../functions');
 
 // returns a mysql query based on url, method, req. body and parameters
 exports.GetQuery = async (info) => {
@@ -64,15 +64,16 @@ exports.GetSelectQuery = async (info) => {
       if (isEmpty(query_params) && full_resource_path.includes("(")) {
         //case to support get by id in odata e.g. http://127.0.0.1:1880/root/users('Ravi')
         query = 'SELECT * FROM tablename';
-        entity_with_param = entity
+        entity_with_param = entity;
         entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
         entity_with_param = entity_with_param.split('(');
-        entity = entity_with_param[0]
-        param = entity_with_param[1]
-        query = query + " WHERE "
-        primary_key = GetKeyFromModel(info.data_model, entity)
-        query = query + primary_key + " = " + param
-        properties ? query = query.replace("*", properties) : query;
+        entity = entity_with_param[0];
+        param = entity_with_param[1];
+        query = query + " WHERE ";
+        primary_key = GetKeyFromModel(info.data_model, entity);
+        query = query + primary_key + " = " + param;
+        properties ? query = query.replace("*", GetCaseSensitiveNames(properties)) : query;
+        entity = GetCaseSensitiveNames(entity);
         info.schema ? entity = info.schema + '.' + entity : entity;
         return query.replace("tablename", entity);
       } else {
@@ -81,11 +82,11 @@ exports.GetSelectQuery = async (info) => {
         //to counter user error where user appends user(id) with query parameters
         full_resource_path.includes("(") ? entity = GetEntity(entity) : entity;
         //To add columns name to select statements
-        query_params.$select ? query = query.replace("*", await GetPostgresColumNames(query_params.$select)) : query;
+        query_params.$select ? query = query.replace("*", await GetCaseSensitiveNames(query_params.$select)) : query;
         if (query_params.$filter) {
           predicates = query_params.$filter.split(' ');
-          filterString = GetFilterQueryString(predicates)
-          query = query + " WHERE " + filterString
+          filterString = GetFilterQueryString(predicates);
+          query = query + " WHERE " + filterString;
         }
         orderbyadded = false
         if (query_params.$orderby) {
@@ -112,6 +113,7 @@ exports.GetSelectQuery = async (info) => {
             orderbyadded = true
           }
         }
+        entity = GetCaseSensitiveNames(entity);
         info.schema ? entity = info.schema + '.' + entity : entity;
         return query.replace("tablename", entity);
       }
@@ -124,12 +126,13 @@ exports.GetSelectQuery = async (info) => {
 exports.GetInsertQuery = async (info) => {
   try {
     const data = GetInsertionColumnsAndValues(info.body);
-    query = `INSERT INTO tablename(${data.columns}) VALUES (${data.Values})`
-    full_resource_path = info.resource_path
+    CaseSensitiveColumns = await GetCaseSensitiveNames(data.columns)
+    query = `INSERT INTO tablename(${CaseSensitiveColumns}) VALUES (${data.Values})`
+    full_resource_path = info.resource_path;
     //isolating service root and entity name
     resource_path = full_resource_path.split('/');
-    entity = resource_path[2]
-    properties = resource_path[3]
+    entity = resource_path[2];
+    properties = resource_path[3];
     if (entity === '$metadata' || entity === '') {
       return query = GetMetadataQuery();
     }
@@ -137,6 +140,7 @@ exports.GetInsertQuery = async (info) => {
       query = `BatchSegment translation is not supported`
     }
     else {
+      entity = GetCaseSensitiveNames(entity);
       info.schema ? entity = info.schema + '.' + entity : entity;
       query = query.replace("tablename", entity);
     }
@@ -150,31 +154,33 @@ exports.GetUpdateQuery = async (info) => {
   try {
     const setConditions = GetUpdateSetColumns(info.body);
     query = `UPDATE tablename SET ${setConditions}`;
-    full_resource_path = info.resource_path
+    full_resource_path = info.resource_path;
     //isolating service root and entity name
     resource_path = full_resource_path.split('/');
-    entity = resource_path[2]
-    properties = resource_path[3]
+    entity = resource_path[2];
+    properties = resource_path[3];
     if (entity === '$metadata' || entity === '') {
       return query = GetMetadataQuery();
     }
     else if (entity === '$batch') {
-      query = `BatchSegment translation is not supported`
+      query = `BatchSegment translation is not supported`;
     }
     else {
       //checking for param in parenthesis (key)
       if (full_resource_path.includes("(") && full_resource_path.includes(")")) {
-        entity_with_param = entity
+        entity_with_param = entity;
         entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
         entity_with_param = entity_with_param.split('(');
-        entity = entity_with_param[0]
-        param = entity_with_param[1]
-        query = query + " WHERE "
-        primary_key = GetKeyFromModel(info.data_model, entity)
-        query = query + primary_key + " = " + param
+        entity = entity_with_param[0];
+        param = entity_with_param[1];
+        query = query + " WHERE ";
+        primary_key = GetCaseSensitiveNames(await GetKeyFromModel(info.data_model, entity));
+        query = query + primary_key + " = " + param;
+        entity = GetCaseSensitiveNames(entity);
         info.schema ? entity = info.schema + '.' + entity : entity;
         return query.replace("tablename", entity);
       } else {
+        entity = GetCaseSensitiveNames(entity);
         info.schema ? entity = info.schema + '.' + entity : entity;
         return "SELECT * FROM " + entity;
       }
@@ -207,11 +213,13 @@ exports.GetDeleteQuery = async (info) => {
         entity = entity_with_param[0]
         param = entity_with_param[1]
         query = query + " WHERE "
-        primary_key = GetKeyFromModel(info.data_model, entity)
-        query = query + primary_key + " = " + param
+        primary_key = GetCaseSensitiveNames(await GetKeyFromModel(info.data_model, entity))
+        query = query + primary_key + " = " + param;
+        entity = GetCaseSensitiveNames(entity);
         info.schema ? entity = info.schema + '.' + entity : entity;
         return query.replace("tablename", entity);
       } else {
+        entity = GetCaseSensitiveNames(entity);
         info.schema ? entity = info.schema + '.' + entity : entity;
         return "SELECT * FROM " + entity;
       }

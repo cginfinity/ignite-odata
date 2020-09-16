@@ -33,7 +33,7 @@ exports.GetQueryParamString = (data) => {
 };
 
 // returns the columns and values for the insert query
-exports.GetPostgresColumNames = (columns) => {
+exports.GetCaseSensitiveNames = (columns) => {
   columns = columns.split(",");
   var columnString = '';
   count = 0;
@@ -41,10 +41,19 @@ exports.GetPostgresColumNames = (columns) => {
     if (columns[column].charAt(0) === " ") {
       columns[column] = columns[column].substring(1, columns[column].length);
     }
-    count !== columns.length - 1 ?
-      columnString += '"' + columns[column] + '",'
-      :
-      columnString += '"' + columns[column] + '"'
+    //Checking if columnName has Capital letters
+    //Only adding "" when necessary
+    if (/[A-Z]/.test(columns[column])) {
+      count !== columns.length - 1 ?
+        columnString += '"' + columns[column] + '",'
+        :
+        columnString += '"' + columns[column] + '"'
+    } else {
+      count !== columns.length - 1 ?
+        columnString += columns[column] + ','
+        :
+        columnString += columns[column]
+    }
     count++;
   }
   return columnString
