@@ -4,7 +4,7 @@ const { GetUpdateSetColumns,
   GetKeyFromModel,
   GetFilterQueryString
 } = require('../sql');
-const { isEmpty, GetEntity } = require('../functions');
+const { isEmpty, GetEntity, GetPostgresColumNames } = require('../functions');
 
 // returns a mysql query based on url, method, req. body and parameters
 exports.GetQuery = async (info) => {
@@ -80,8 +80,8 @@ exports.GetSelectQuery = async (info) => {
         query = 'SELECT * FROM tablename';
         //to counter user error where user appends user(id) with query parameters
         full_resource_path.includes("(") ? entity = GetEntity(entity) : entity;
-        //TO add columns name to select staements
-        query_params.$select ? query = query.replace("*", query_params.$select) : query;
+        //To add columns name to select statements
+        query_params.$select ? query = query.replace("*", await GetPostgresColumNames(query_params.$select)) : query;
         if (query_params.$filter) {
           predicates = query_params.$filter.split(' ');
           filterString = GetFilterQueryString(predicates)
@@ -211,7 +211,7 @@ exports.GetDeleteQuery = async (info) => {
         query = query + primary_key + " = " + param
         info.schema ? entity = info.schema + '.' + entity : entity;
         return query.replace("tablename", entity);
-      } else {        
+      } else {
         info.schema ? entity = info.schema + '.' + entity : entity;
         return "SELECT * FROM " + entity;
       }
