@@ -1,10 +1,4 @@
-const { GetUpdateSetColumns,
-  GetInsertionColumnsAndValues,
-  GetMetadataQuery,
-  GetKeyFromModel,
-  GetFilterQueryString
-} = require('../sql');
-const { isEmpty, GetEntity } = require('../functions');
+const { GetUpdateSetColumns, GetInsertionColumnsAndValues, GetMetadataQuery, GetKeyFromModel, GetFilterQueryString, isEmpty, GetEntity} = require('../functions');
 
 // returns a mysql query based on url, method, req. body and parameters
 exports.GetQuery = async (info) => {
