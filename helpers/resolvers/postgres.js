@@ -1,4 +1,4 @@
-const { GetUpdateSetColumns, GetInsertionColumnsAndValues, GetMetadataQuery, GetKeyFromModel, GetFilterQueryString, GetCaseSensitiveNames, isEmpty, GetEntity} = require('../functions');
+const { GetCaseSensitiveUpdateSetColumns, GetInsertionColumnsAndValues, GetMetadataQuery, GetKeyFromModel, GetFilterQueryString, GetCaseSensitiveNames, isEmpty, GetEntity} = require('../functions');
 
 // returns a mysql query based on url, method, req. body and parameters
 exports.GetQuery = async (info) => {
@@ -63,9 +63,9 @@ exports.GetSelectQuery = async (info) => {
         entity_with_param = entity_with_param.split('(');
         entity = entity_with_param[0];
         param = entity_with_param[1];
-        query = query + " WHERE ";
-        primary_key = GetKeyFromModel(info.data_model, entity);
-        query = query + primary_key + " = " + param;
+        // query = query + " WHERE ";
+        primary_key = GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity));
+        query = query + " WHERE " + primary_key + " = " + param;
         properties ? query = query.replace("*", GetCaseSensitiveNames(properties)) : query;
         entity = GetCaseSensitiveNames(entity);
         info.schema ? entity = info.schema + '.' + entity : entity;
@@ -146,7 +146,7 @@ exports.GetInsertQuery = async (info) => {
 
 exports.GetUpdateQuery = async (info) => {
   try {
-    const setConditions = GetUpdateSetColumns(info.body);
+    const setConditions = GetCaseSensitiveUpdateSetColumns(info.body);
     query = `UPDATE tablename SET ${setConditions}`;
     full_resource_path = info.resource_path;
     //isolating service root and entity name

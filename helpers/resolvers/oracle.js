@@ -63,9 +63,8 @@ exports.GetSelectQuery = async (info) => {
         entity_with_param = entity_with_param.split('(');
         entity = entity_with_param[0]
         param = entity_with_param[1]
-        query = query + " WHERE "
         primary_key = GetKeyFromModel(info.data_model, entity)
-        query = query + primary_key + " = " + param
+        query = query + " WHERE " + primary_key + " = " + param
         properties ? query = query.replace("*", properties) : query;
         info.schema ? entity = info.schema + '.' + entity : entity;
         return query.replace("tablename", entity);

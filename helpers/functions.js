@@ -104,6 +104,30 @@ exports.GetCaseSensitiveUpdateSetColumns = (data) => {
   return condition;
 };
 
+// wraps around column, table name in "" if they have capital letters in it
+exports.GetCaseSensitiveNames = (columns) => {
+  columns = columns.split(",");
+  var columnString = '';
+  count = 0;
+  for (column in columns) {
+    if (columns[column].charAt(0) === " ") {
+      columns[column] = columns[column].substring(1, columns[column].length);
+    }
+    //Checking if columnName has Capital letters
+    //Only adding "" when necessary
+    (/[A-Z]/.test(columns[column])) ?
+      columnString += '"' + columns[column] + '"'
+      :
+      columnString += columns[column]
+    count !== columns.length - 1 ?
+      columnString += ','
+      :
+      columnString
+    count++;
+  }
+  return columnString;
+};
+
 // returns the primary key from and edmx (json object model)
 exports.GetKeyFromModel = (model, tableName) => {
   for (entity in model.entityTypes) {
@@ -124,6 +148,49 @@ exports.isEmpty = (obj) => {
       return false;
   }
   return true;
+};
+
+// returns entity by removing by breaking at parenthesis or any additional attached strings
+exports.GetEntity = (entity) => {
+  entity_with_param = entity.split('(');
+  return entity_with_param[0];
+};
+
+// returns Queryparam string for odata cleint to add to url
+exports.GetQueryParamString = (data) => {
+  var queryString = '',
+    count = 0;
+  for (key in data) {
+    if (data[key] !== "") {
+      queryString =
+        count !== Object.keys(data).length - 1
+          ? queryString + key + "=" + data[key] + "&"
+          : queryString + key + "=" + data[key];
+      count++;
+    }
+  }
+  if (queryString.charAt(queryString.length - 1) === "&") {
+    queryString = queryString.substring(0, queryString.length - 1);
+  }
+  return queryString
+};
+
+// returns a string for $filter query param, replaces operator symbols with operators, breaks mulriple predicates by spaces 
+exports.GetFilterQueryString = (predicates) => {
+  filterString = ''
+  for (i = 0; i < predicates.length; i++) {
+    filterString = filterString + predicates[i] + " " + this.ConvertToOperator(predicates[i + 1]) + " " //+ predicates[i + 2]
+    if (predicates[i + 2].substring(0, 1) == "'") {
+      filterString = filterString + predicates[i + 2]
+    } else {
+      filterString = filterString + "'" + predicates[i + 2] + "'"
+    }
+    if (predicates[i + 3]) {
+      filterString = filterString + " " + predicates[i + 3] + " "
+    }
+    i = i + 3
+  }
+  return filterString
 };
 
 // returns the operator value based on odata expression in url
@@ -152,73 +219,6 @@ exports.ConvertToOperator = (odataOperator) => {
       throw new Error('Invalid operator code, expected one of ["=", "!=", ">", ">=", "<", "<="].');
   }
   return operator;
-};
-
-// returns entity by removing by breaking at parenthesis or any additional attached strings
-exports.GetEntity = (entity) => {
-  entity_with_param = entity.split('(');
-  return entity_with_param[0];
-};
-
-// returns Queryparam string for odata cleint to add to url
-exports.GetQueryParamString = (data) => {
-  var queryString = '',
-    count = 0;
-  for (key in data) {
-    if (data[key] !== "") {
-      queryString =
-        count !== Object.keys(data).length - 1
-          ? queryString + key + "=" + data[key] + "&"
-          : queryString + key + "=" + data[key];
-      count++;
-    }
-  }
-  if (queryString.charAt(queryString.length - 1) === "&") {
-    queryString = queryString.substring(0, queryString.length - 1);
-  }
-  return queryString
-};
-
-// wraps around colum, table name in "" if they have capital letters in it
-exports.GetCaseSensitiveNames = (columns) => {
-  columns = columns.split(",");
-  var columnString = '';
-  count = 0;
-  for (column in columns) {
-    if (columns[column].charAt(0) === " ") {
-      columns[column] = columns[column].substring(1, columns[column].length);
-    }
-    //Checking if columnName has Capital letters
-    //Only adding "" when necessary
-    (/[A-Z]/.test(columns[column])) ?
-      columnString += '"' + columns[column] + '"'
-      :
-      columnString
-    count !== columns.length - 1 ?
-      columnString += ','
-      :
-      columnString
-    count++;
-  }
-  return columnString;
-};
-
-// returns a string for $filter query param, replaces operator symbols with operators, breaks mulriple predicates by spaces 
-exports.GetFilterQueryString = (predicates) => {
-  filterString = ''
-  for (i = 0; i < predicates.length; i++) {
-    filterString = filterString + predicates[i] + " " + this.ConvertToOperator(predicates[i + 1]) + " " //+ predicates[i + 2]
-    if (predicates[i + 2].substring(0, 1) == "'") {
-      filterString = filterString + predicates[i + 2]
-    } else {
-      filterString = filterString + "'" + predicates[i + 2] + "'"
-    }
-    if (predicates[i + 3]) {
-      filterString = filterString + " " + predicates[i + 3] + " "
-    }
-    i = i + 3
-  }
-  return filterString
 };
 
 // returns a query to query metadata from database
