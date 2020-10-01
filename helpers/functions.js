@@ -61,28 +61,18 @@ exports.GetInsertionColumnsAndValuesRefactored = (data) => {
     count = 0;
   for (key in data) {
     if (!key.includes("odata.type")) {
-      columns +=
-        count !== Object.keys(data).length - 1
-          ? key + ","
-          : key;
+      columns += key;
       Values +=
-        count !== Object.keys(data).length - 1 ?
-          typeof data[key] === "string" ?
-            "'" + data[key] + "'" + ","
-            :
-            data[key] + ","
-          : typeof data[key] === "string" ?
-            "'" + data[key] + "'"
-            :
-            data[key];
+        typeof data[key] === "string" ?
+          "'" + data[key] + "'"
+          :
+          data[key];
+      if(count !== Object.keys(data).length - 1){
+        columns += ","
+        Values += ","
+      }
       count++;
     }
-  }
-  if (columns.charAt(columns.length - 1) === ",") {
-    columns = columns.substring(0, columns.length - 1);
-  }
-  if (Values.charAt(Values.length - 1) === ",") {
-    Values = Values.substring(0, Values.length - 1);
   }
   return {
     columns: columns,
