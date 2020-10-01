@@ -1,6 +1,6 @@
 // returns the columns and values for the insert query
 exports.GetInsertionColumnsAndValues = (data) => {
-  var columns = "",
+    columns = "",
     Values = "",
     count = 0;
   for (key in data) {
@@ -56,7 +56,7 @@ exports.GetUpdateSetColumns = (data) => {
 
 // returns the columns and values for the insert query
 exports.GetInsertionColumnsAndValuesRefactored = (data) => {
-  columns = "",
+    columns = "",
     Values = "",
     count = 0;
   for (key in data) {
@@ -67,7 +67,7 @@ exports.GetInsertionColumnsAndValuesRefactored = (data) => {
           "'" + data[key] + "'"
           :
           data[key];
-      if(count !== Object.keys(data).length - 1){
+      if (count !== Object.keys(data).length - 1) {
         columns += ","
         Values += ","
       }
@@ -179,14 +179,28 @@ exports.GetQueryParamString = (data) => {
 exports.GetFilterQueryString = (predicates) => {
   filterString = ''
   for (i = 0; i < predicates.length; i++) {
-    filterString = filterString + predicates[i] + " " + this.ConvertToOperator(predicates[i + 1]) + " " //+ predicates[i + 2]
+    filterString += predicates[i] + " " + this.ConvertToOperator(predicates[i + 1]) + " " //+ predicates[i + 2]
     if (predicates[i + 2].substring(0, 1) == "'") {
-      filterString = filterString + predicates[i + 2]
+      filterString += predicates[i + 2]
     } else {
-      filterString = filterString + "'" + predicates[i + 2] + "'"
+      filterString += "'" + predicates[i + 2] + "'"
     }
     if (predicates[i + 3]) {
-      filterString = filterString + " " + predicates[i + 3] + " "
+      filterString += " " + predicates[i + 3] + " "
+    }
+    i = i + 3
+  }
+  return filterString
+};
+
+// returns a string for $filter query param, replaces operator symbols with operators, breaks mulriple predicates by spaces 
+exports.GetCaseSensitiveFilterQueryString = (predicates) => {
+  filterString = ''
+  for (i = 0; i < predicates.length; i++) {
+    filterString += this.GetCaseSensitiveNames(predicates[i]) + " " + this.ConvertToOperator(predicates[i + 1]) + " " //+ predicates[i + 2]
+      (predicates[i + 2].substring(0, 1) == "'") ? filterString += predicates[i + 2] : filterString += "'" + predicates[i + 2] + "'"
+    if (predicates[i + 3]) {
+      filterString += " " + predicates[i + 3] + " "
     }
     i = i + 3
   }

@@ -1,4 +1,4 @@
-const { GetCaseSensitiveUpdateSetColumns, GetInsertionColumnsAndValues, GetMetadataQuery, GetKeyFromModel, GetFilterQueryString, GetCaseSensitiveNames, isEmpty, GetEntity} = require('../functions');
+const { GetCaseSensitiveUpdateSetColumns, GetInsertionColumnsAndValues, GetCaseSensitiveFilterQueryString, GetMetadataQuery, GetKeyFromModel, GetCaseSensitiveNames, isEmpty, GetEntity } = require('../functions');
 
 // returns a mysql query based on url, method, req. body and parameters
 exports.GetQuery = async (info) => {
@@ -63,7 +63,6 @@ exports.GetSelectQuery = async (info) => {
         entity_with_param = entity_with_param.split('(');
         entity = entity_with_param[0];
         param = entity_with_param[1];
-        // query = query + " WHERE ";
         primary_key = GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity));
         query = query + " WHERE " + primary_key + " = " + param;
         properties ? query = query.replace("*", GetCaseSensitiveNames(properties)) : query;
@@ -76,15 +75,14 @@ exports.GetSelectQuery = async (info) => {
         //to counter user error where user appends user(id) with query parameters
         entity.includes("(") ? entity = GetEntity(entity) : entity;
         //To add columns name to select statements
-        query_params.$select ? query = query.replace("*", await GetCaseSensitiveNames(query_params.$select)) : query;
+        query_params.$select ? query = query.replace("*", GetCaseSensitiveNames(query_params.$select)) : query;
         if (query_params.$filter) {
           predicates = query_params.$filter.split(' ');
-          filterString = GetFilterQueryString(predicates);
-          query = query + " WHERE " + filterString;
+          query = query + " WHERE " + GetCaseSensitiveFilterQueryString(predicates);;
         }
         orderbyadded = false
         if (query_params.$orderby) {
-          query = query + " ORDER BY " + query_params.$orderby;
+          query = query + " ORDER BY " + GetCaseSensitiveNames(query_params.$orderby);
           orderbyadded = true
         }
         if (query_params.$top) {
@@ -92,7 +90,7 @@ exports.GetSelectQuery = async (info) => {
             query = query + " LIMIT " + query_params.$top
           }
           else {
-            primary_key = GetKeyFromModel(info.data_model, entity)
+            primary_key = GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity));
             query = query + " ORDER BY " + primary_key + " LIMIT " + query_params.$top
             orderbyadded = true
           }
@@ -102,7 +100,7 @@ exports.GetSelectQuery = async (info) => {
             query = query + " OFFSET " + query_params.$skip
           }
           else {
-            primary_key = GetKeyFromModel(info.data_model, entity)
+            primary_key = GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity));
             query = query + " ORDER BY " + primary_key + " OFFSET " + query_params.$skip
             orderbyadded = true
           }
@@ -120,7 +118,7 @@ exports.GetSelectQuery = async (info) => {
 exports.GetInsertQuery = async (info) => {
   try {
     const data = GetInsertionColumnsAndValues(info.body);
-    CaseSensitiveColumns = await GetCaseSensitiveNames(data.columns)
+    CaseSensitiveColumns = GetCaseSensitiveNames(data.columns)
     query = `INSERT INTO tablename(${CaseSensitiveColumns}) VALUES (${data.Values})`
     full_resource_path = info.resource_path;
     //isolating service root and entity name
@@ -168,7 +166,7 @@ exports.GetUpdateQuery = async (info) => {
         entity = entity_with_param[0];
         param = entity_with_param[1];
         query = query + " WHERE ";
-        primary_key = GetCaseSensitiveNames(await GetKeyFromModel(info.data_model, entity));
+        primary_key = GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity));
         query = query + primary_key + " = " + param;
         entity = GetCaseSensitiveNames(entity);
         info.schema ? entity = info.schema + '.' + entity : entity;
@@ -207,7 +205,7 @@ exports.GetDeleteQuery = async (info) => {
         entity = entity_with_param[0]
         param = entity_with_param[1]
         query = query + " WHERE "
-        primary_key = GetCaseSensitiveNames(await GetKeyFromModel(info.data_model, entity))
+        primary_key = GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity))
         query = query + primary_key + " = " + param;
         entity = GetCaseSensitiveNames(entity);
         info.schema ? entity = info.schema + '.' + entity : entity;
