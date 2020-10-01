@@ -63,8 +63,7 @@ exports.GetSelectQuery = async (info) => {
         entity_with_param = entity_with_param.split('(');
         entity = entity_with_param[0]
         param = entity_with_param[1]
-        primary_key = GetKeyFromModel(info.data_model, entity)
-        query = query + " WHERE " + primary_key + " = " + param
+        query += " WHERE " + GetKeyFromModel(info.data_model, entity) + " = " + param
         properties ? query = query.replace("*", properties) : query;
         info.schema ? entity = info.schema + '.' + entity : entity;
         return query.replace("tablename", entity);
@@ -77,31 +76,28 @@ exports.GetSelectQuery = async (info) => {
         query_params.$select ? query = query.replace("*", query_params.$select) : query;
         if (query_params.$filter) {
           predicates = query_params.$filter.split(' ');
-          filterString = GetFilterQueryString(predicates)
-          query = query + " WHERE " + filterString
+          query += " WHERE " + GetFilterQueryString(predicates)
         }
         orderbyadded = false
         if (query_params.$orderby) {
-          query = query + " ORDER BY " + query_params.$orderby;
+          query += " ORDER BY " + query_params.$orderby;
           orderbyadded = true
         }
         if (query_params.$skip) {
           if (orderbyadded === true) {
-            query = query + " OFFSET " + query_params.$skip + " ROWS"
+            query += " OFFSET " + query_params.$skip + " ROWS"
           }
           else {
-            primary_key = GetKeyFromModel(info.data_model, entity)
-            query = query + " ORDER BY " + primary_key + " OFFSET " + query_params.$skip + " ROWS"
+            query += " ORDER BY " + GetKeyFromModel(info.data_model, entity) + " OFFSET " + query_params.$skip + " ROWS"
             orderbyadded = true
           }
         }
         if (query_params.$top && query_params.$skip) {
           if (orderbyadded === true) {
-            query = query + " FETCH NEXT " + query_params.$top + " ROWS ONLY "
+            query += " FETCH NEXT " + query_params.$top + " ROWS ONLY "
           }
           else {
-            primary_key = GetKeyFromModel(info.data_model, entity)
-            query = query + " ORDER BY " + primary_key + " FETCH NEXT " + query_params.$top + " ROWS ONLY"
+            query += " ORDER BY " + GetKeyFromModel(info.data_model, entity) + " FETCH NEXT " + query_params.$top + " ROWS ONLY"
             orderbyadded = true
           }
         }
@@ -109,8 +105,7 @@ exports.GetSelectQuery = async (info) => {
           limit = `SELECT TOP ${query_params.$top}`
           query = query.replace("SELECT", limit);
           if (orderbyadded !== true) {
-            primary_key = GetKeyFromModel(info.data_model, entity)
-            query = query + " ORDER BY " + primary_key
+            query += " ORDER BY " + GetKeyFromModel(info.data_model, entity)
           }
         }
         info.schema ? entity = info.schema + '.' + entity : entity;
@@ -170,9 +165,7 @@ exports.GetUpdateQuery = async (info) => {
         entity_with_param = entity_with_param.split('(');
         entity = entity_with_param[0]
         param = entity_with_param[1]
-        query = query + " WHERE "
-        primary_key = GetKeyFromModel(info.data_model, entity)
-        query = query + primary_key + " = " + param
+        query += " WHERE " + GetKeyFromModel(info.data_model, entity) + " = " + param
         info.schema ? entity = info.schema + '.' + entity : entity;
         return query.replace("tablename", entity);
       } else {
@@ -207,9 +200,7 @@ exports.GetDeleteQuery = async (info) => {
         entity_with_param = entity_with_param.split('(');
         entity = entity_with_param[0]
         param = entity_with_param[1]
-        query = query + " WHERE "
-        primary_key = GetKeyFromModel(info.data_model, entity)
-        query = query + primary_key + " = " + param
+        query += " WHERE " + GetKeyFromModel(info.data_model, entity) + " = " + param
         info.schema ? entity = info.schema + '.' + entity : entity;
         return query.replace("tablename", entity);
       } else {

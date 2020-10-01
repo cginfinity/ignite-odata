@@ -63,8 +63,7 @@ exports.GetSelectQuery = async (info) => {
         entity_with_param = entity_with_param.split('(');
         entity = entity_with_param[0];
         param = entity_with_param[1];
-        primary_key = GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity));
-        query = query + " WHERE " + primary_key + " = " + param;
+        query += " WHERE " + GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity)) + " = " + param;
         properties ? query = query.replace("*", GetCaseSensitiveNames(properties)) : query;
         entity = GetCaseSensitiveNames(entity);
         info.schema ? entity = info.schema + '.' + entity : entity;
@@ -78,30 +77,28 @@ exports.GetSelectQuery = async (info) => {
         query_params.$select ? query = query.replace("*", GetCaseSensitiveNames(query_params.$select)) : query;
         if (query_params.$filter) {
           predicates = query_params.$filter.split(' ');
-          query = query + " WHERE " + GetCaseSensitiveFilterQueryString(predicates);;
+          query += " WHERE " + GetCaseSensitiveFilterQueryString(predicates);;
         }
         orderbyadded = false
         if (query_params.$orderby) {
-          query = query + " ORDER BY " + GetCaseSensitiveNames(query_params.$orderby);
+          query += " ORDER BY " + GetCaseSensitiveNames(query_params.$orderby);
           orderbyadded = true
         }
         if (query_params.$top) {
           if (orderbyadded === true) {
-            query = query + " LIMIT " + query_params.$top
+            query += " LIMIT " + query_params.$top
           }
           else {
-            primary_key = GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity));
-            query = query + " ORDER BY " + primary_key + " LIMIT " + query_params.$top
+            query += " ORDER BY " + GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity)) + " LIMIT " + query_params.$top
             orderbyadded = true
           }
         }
         if (query_params.$skip) {
           if (orderbyadded === true) {
-            query = query + " OFFSET " + query_params.$skip
+            query += " OFFSET " + query_params.$skip
           }
           else {
-            primary_key = GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity));
-            query = query + " ORDER BY " + primary_key + " OFFSET " + query_params.$skip
+            query += " ORDER BY " + GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity)) + " OFFSET " + query_params.$skip
             orderbyadded = true
           }
         }
@@ -165,9 +162,7 @@ exports.GetUpdateQuery = async (info) => {
         entity_with_param = entity_with_param.split('(');
         entity = entity_with_param[0];
         param = entity_with_param[1];
-        query = query + " WHERE ";
-        primary_key = GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity));
-        query = query + primary_key + " = " + param;
+        query += " WHERE " + GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity)) + " = " + param;
         entity = GetCaseSensitiveNames(entity);
         info.schema ? entity = info.schema + '.' + entity : entity;
         return query.replace("tablename", entity);
