@@ -55,7 +55,7 @@ exports.GetSelectQuery = async (info) => {
     }
     else {
       //logic to query data using query parameters in url
-      if (isEmpty(query_params) && full_resource_path.includes("(")) {
+      if (isEmpty(query_params) && entity.includes("(")) {
         //case to support get by id in odata e.g. http://127.0.0.1:1880/root/users('Ravi')
         query = 'SELECT * FROM tablename';
         entity_with_param = entity
@@ -72,7 +72,7 @@ exports.GetSelectQuery = async (info) => {
         //case for find by id 
         query = 'SELECT * FROM tablename';
         //to counter user error where user appends user(id) with query parameters
-        full_resource_path.includes("(") ? entity = GetEntity(entity) : entity;
+        entity.includes("(") ? entity = GetEntity(entity) : entity;
         //TO add columns name to select staements
         query_params.$select ? query = query.replace("*", query_params.$select) : query;
         if (query_params.$filter) {
@@ -156,7 +156,7 @@ exports.GetUpdateQuery = async (info) => {
     }
     else {
       //checking for param in parenthesis (key)
-      if (full_resource_path.includes("(") && full_resource_path.includes(")")) {
+      if (entity.includes("(") && entity.includes(")")) {
         entity_with_param = entity
         entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
         entity_with_param = entity_with_param.split('(');
@@ -193,7 +193,7 @@ exports.GetDeleteQuery = async (info) => {
     }
     else {
       //checking for param in parenthesis 
-      if (full_resource_path.includes("(") && full_resource_path.includes(")")) {
+      if (entity.includes("(") && entity.includes(")")) {
         entity_with_param = entity
         entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
         entity_with_param = entity_with_param.split('(');
