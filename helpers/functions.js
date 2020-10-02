@@ -185,8 +185,8 @@ exports.GetQueryParamString = (data) => {
 exports.GetFilterQueryString = (predicates) => {
   filterString = ''
   for (i = 0; i < predicates.length; i++) {
-    filterString += predicates[i] + " " + this.ConvertToOperator(predicates[i + 1]) + " " //+ predicates[i + 2]
-    if (predicates[i + 2].substring(0, 1) == "'") {
+    filterString += predicates[i] + " " + this.ConvertToOperator(predicates[i + 1]) + " " 
+    if (predicates[i + 2].substring(0, 1) === "'") {
       filterString += predicates[i + 2]
     } else {
       filterString += "'" + predicates[i + 2] + "'"
@@ -199,12 +199,16 @@ exports.GetFilterQueryString = (predicates) => {
   return filterString
 };
 
-// returns a string for $filter query param, replaces operator symbols with operators, breaks mulriple predicates by spaces 
+// returns a case sensitive string(wraps in "") for $filter query param, replaces operator symbols with operators, breaks mulriple predicates by spaces 
 exports.GetCaseSensitiveFilterQueryString = (predicates) => {
   filterString = ''
   for (i = 0; i < predicates.length; i++) {
-    filterString += this.GetCaseSensitiveNames(predicates[i]) + " " + this.ConvertToOperator(predicates[i + 1]) + " " //+ predicates[i + 2]
-      (predicates[i + 2].substring(0, 1) == "'") ? filterString += predicates[i + 2] : filterString += "'" + predicates[i + 2] + "'"
+    filterString += this.GetCaseSensitiveNames(predicates[i]) + " " + this.ConvertToOperator(predicates[i + 1]) + " "
+    if (predicates[i + 2].substring(0, 1) === "'") {
+      filterString += predicates[i + 2]
+    } else {
+      filterString += "'" + predicates[i + 2] + "'"
+    }
     if (predicates[i + 3]) {
       filterString += " " + predicates[i + 3] + " "
     }
