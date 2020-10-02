@@ -92,6 +92,9 @@ exports.GetSelectQuery = async (info) => {
             orderbyadded = true
           }
         }
+        if(!orderbyadded){
+          query += " ORDER BY " + GetKeyFromModel(info.data_model, entity);
+        }
         info.schema ? entity = info.schema + '.' + entity : entity;
         return query.replace("tablename", entity);
       }

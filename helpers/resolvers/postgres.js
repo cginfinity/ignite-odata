@@ -1,4 +1,4 @@
-const { GetCaseSensitiveUpdateSetColumns, GetInsertionColumnsAndValues, GetCaseSensitiveFilterQueryString, GetMetadataQuery, GetKeyFromModel, GetCaseSensitiveNames, isEmpty, GetEntity } = require('../functions');
+const { GetCaseSensitiveUpdateSetColumns, GetInsertionColumnsAndValues, GetFilterQueryString, GetCaseSensitiveFilterQueryString, GetMetadataQuery, GetKeyFromModel, GetCaseSensitiveNames, isEmpty, GetEntity } = require('../functions');
 
 // returns a mysql query based on url, method, req. body and parameters
 exports.GetQuery = async (info) => {
@@ -77,7 +77,7 @@ exports.GetSelectQuery = async (info) => {
         query_params.$select ? query = query.replace("*", GetCaseSensitiveNames(query_params.$select)) : query;
         if (query_params.$filter) {
           predicates = query_params.$filter.split(' ');
-          query += " WHERE " + GetCaseSensitiveFilterQueryString(predicates);;
+          query += " WHERE " + GetCaseSensitiveFilterQueryString(predicates);
         }
         orderbyadded = false
         if (query_params.$orderby) {
@@ -101,6 +101,9 @@ exports.GetSelectQuery = async (info) => {
             query += " ORDER BY " + GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity)) + " OFFSET " + query_params.$skip
             orderbyadded = true
           }
+        }
+        if(!orderbyadded){
+          query += " ORDER BY " + GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity));
         }
         entity = GetCaseSensitiveNames(entity);
         info.schema ? entity = info.schema + '.' + entity : entity;

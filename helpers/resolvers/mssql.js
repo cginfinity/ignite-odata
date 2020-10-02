@@ -106,7 +106,11 @@ exports.GetSelectQuery = async (info) => {
           query = query.replace("SELECT", limit);
           if (orderbyadded !== true) {
             query += " ORDER BY " + GetKeyFromModel(info.data_model, entity)
+            orderbyadded = true
           }
+        }
+        if(!orderbyadded){
+          query += " ORDER BY " + GetKeyFromModel(info.data_model, entity);
         }
         info.schema ? entity = info.schema + '.' + entity : entity;
         return query.replace("tablename", entity);
