@@ -1,32 +1,24 @@
 const { GetAsync, PostAsync, PutAsync, PatchAsync, DeleteAsync } = require('./callApi');
-const { GetQueryParamString } = require('./functions');
 
-exports.client = async (clientInfo, queryParams) => {
+exports.client = async (clientInfo) => {
   try {
-    url = clientInfo.rootURL + clientInfo.resource;
-    clientInfo.reqheaders ? headers = clientInfo.reqheaders : headers = {}
-    clientInfo.reqbody ? data = clientInfo.reqbody : data = {}
-    queryParamString = GetQueryParamString(queryParams)
-    if(queryParamString !== ''){
-      url = url + '?' + queryParamString
-    } 
     if (clientInfo.method === 'GET') {
-      return await GetAsync(url, headers)
+      return await GetAsync(clientInfo.reqUrl, clientInfo.reqheaders)
     }
     else if (clientInfo.method === 'POST') {
-      return await PostAsync(url, headers, data)
+      return await PostAsync(clientInfo.reqUrl, clientInfo.reqheaders, clientInfo.reqbody)
     }
     else if (clientInfo.method === 'PUT') {
-      return await PutAsync(url, headers, data)
+      return await PutAsync(clientInfo.reqUrl, clientInfo.reqheaders, clientInfo.reqbody)
     }
     else if (clientInfo.method === 'PATCH') {
-      return await PatchAsync(url, headers, data)
+      return await PatchAsync(clientInfo.reqUrl, clientInfo.reqheaders, clientInfo.reqbody)
     }
     else if (clientInfo.method === 'DELETE') {
-      return await DeleteAsync(url, headers)
+      return await DeleteAsync(clientInfo.reqUrl, clientInfo.reqheaders)
     }
     else {
-      return "Couldn't process your request";
+      return "Please choose a method";
     }
   } catch (err) {
     return err
