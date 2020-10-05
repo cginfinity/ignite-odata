@@ -1,34 +1,22 @@
 // returns the columns and values for the insert query
 exports.GetInsertionColumnsAndValues = (data) => {
-    columns = "",
-    Values = "",
-    count = 0;
+  columns = "";
+  Values = "";
+  count = 0;
   for (key in data) {
     if (!key.includes("odata.type")) {
-      columns =
-        count !== Object.keys(data).length - 1
-          ? columns + key + ","
-          : columns + key;
-      Values =
-        count !== Object.keys(data).length - 1
-          ? typeof data[key] === "string"
-            ? Values + "'" + data[key] + "'" + ","
-            : Values + data[key] + ","
-          : typeof data[key] === "string"
-            ? Values + "'" + data[key] + "'"
-            : Values + data[key];
-      count++;
+      columns += key;
+      Values += typeof data[key] === "string" ? "'" + data[key] + "'" : Values + data[key];
+      if (count !== Object.keys(data).length - 1) {
+        columns += ",";
+        Values += ",";
+      }
     }
-  }
-  if (columns.charAt(columns.length - 1) === ",") {
-    columns = columns.substring(0, columns.length - 1);
-  }
-  if (Values.charAt(Values.length - 1) === ",") {
-    Values = Values.substring(0, Values.length - 1);
+    count++;
   }
   return {
-    columns: columns,
-    Values: Values
+    columns: this.RemoveCharFromEndOfString(columns, ","),
+    Values: this.RemoveCharFromEndOfString(Values, ",")
   };
 };
 
@@ -37,52 +25,36 @@ exports.GetUpdateSetColumns = (data) => {
   var condition = "", count = 0;
   for (key in data) {
     if (!key.includes("odata.type")) {
-      condition =
-        count !== Object.keys(data).length - 1
-          ? typeof data[key] === "string"
-            ? condition + key + "='" + data[key] + "',"
-            : condition + key + "=" + data[key] + ","
-          : typeof data[key] === "string"
-            ? condition + key + "='" + data[key] + "'"
-            : condition + key + "=" + data[key];
+      condition += typeof (data[key]) === "string" ? key + "='" + data[key] + "'" : key + "=" + data[key];
+      if (count !== Object.keys(data).length - 1) {
+        condition += ",";
+      }
       count++;
     }
   }
-  if (condition.charAt(condition.length - 1) === ",") {
-    condition = condition.substring(0, condition.length - 1);
-  }
-  return condition;
+  return this.RemoveCharFromEndOfString(condition, ",");
 };
 
 // returns the columns and values for the insert query
 exports.GetInsertionColumnsAndValuesRefactored = (data) => {
-    columns = "",
+  columns = "",
     Values = "",
     count = 0;
   for (key in data) {
     if (!key.includes("odata.type")) {
       columns += key;
       Values +=
-        typeof data[key] === "string" ?
-          "'" + data[key] + "'"
-          :
-          data[key];
+        typeof data[key] === "string" ? "'" + data[key] + "'" : data[key];
       if (count !== Object.keys(data).length - 1) {
         columns += ","
         Values += ","
       }
-      count++;
     }
-  }
-  if (columns.charAt(columns.length - 1) === ",") {
-    columns = columns.substring(0, columns.length - 1);
-  }
-  if (Values.charAt(Values.length - 1) === ",") {
-    Values = Values.substring(0, Values.length - 1);
+    count++;
   }
   return {
-    columns: columns,
-    Values: Values
+    columns: this.RemoveCharFromEndOfString(columns, ","),
+    Values: this.RemoveCharFromEndOfString(Values, ",")
   };
 };
 
@@ -96,18 +68,11 @@ exports.GetCaseSensitiveUpdateSetColumns = (data) => {
           this.GetCaseSensitiveNames(key) + "='" + data[key] + "'"
           :
           this.GetCaseSensitiveNames(key) + "=" + data[key]
-      count !== Object.keys(data).length - 1 ?
-        condition += ","
-        :
-        condition
+      count !== Object.keys(data).length - 1 ? condition += "," : condition;
       count++;
     }
   }
-  //checking if comma exists at the end of string just to make sure
-  if (condition.charAt(condition.length - 1) === ",") {
-    condition = condition.substring(0, condition.length - 1);
-  }
-  return condition;
+  return this.RemoveCharFromEndOfString(condition, ",");;
 };
 
 // wraps around column, table name in "" if they have capital letters in it
@@ -119,16 +84,9 @@ exports.GetCaseSensitiveNames = (columns) => {
     if (columns[column].charAt(0) === " ") {
       columns[column] = columns[column].substring(1, columns[column].length);
     }
-    //Checking if columnName has Capital letters
-    //Only adding "" when necessary
-    (/[A-Z]/.test(columns[column])) ?
-      columnString += '"' + columns[column] + '"'
-      :
-      columnString += columns[column]
-    count !== columns.length - 1 ?
-      columnString += ','
-      :
-      columnString
+    //Checking quotes if columnName has Capital letters
+    (/[A-Z]/.test(columns[column])) ? columnString += '"' + columns[column] + '"' : columnString += columns[column];
+    count !== columns.length - 1 ? columnString += ',' : columnString;
     count++;
   }
   return columnString;
@@ -140,7 +98,7 @@ exports.GetKeyFromModel = (model, tableName) => {
     if (entity == tableName) {
       for (property in model.entityTypes[entity]) {
         if (model.entityTypes[entity][property].key === true) {
-          return property
+          return property;
         };
       }
     };
@@ -162,59 +120,64 @@ exports.GetEntity = (entity) => {
   return entity_with_param[0];
 };
 
+// removes comma present at the end of string and return the new string
+exports.RemoveCharFromEndOfString = (string, char) => {
+  if (string.charAt(string.length - 1) === char) {
+    string = this.RemoveCharFromEndOfString(string.substring(0, string.length - 1), char);
+  }
+  return string;
+};
+
 // returns Queryparam string for odata cleint to add to url
 exports.GetQueryParamString = (data) => {
-  var queryString = '',
-    count = 0;
+  var queryString = '';
+  count = 0;
   for (key in data) {
     if (data[key] !== "") {
-      queryString =
+      queryString +=
         count !== Object.keys(data).length - 1
-          ? queryString + key + "=" + data[key] + "&"
-          : queryString + key + "=" + data[key];
+          ? key + "=" + data[key] + "&"
+          : key + "=" + data[key];
       count++;
     }
   }
-  if (queryString.charAt(queryString.length - 1) === "&") {
-    queryString = queryString.substring(0, queryString.length - 1);
-  }
-  return queryString
+  return this.RemoveCharFromEndOfString(queryString, "&");
 };
 
 // returns a string for $filter query param, replaces operator symbols with operators, breaks mulriple predicates by spaces 
 exports.GetFilterQueryString = (predicates) => {
-  filterString = ''
+  filterString = '';
   for (i = 0; i < predicates.length; i++) {
-    filterString += predicates[i] + " " + this.ConvertToOperator(predicates[i + 1]) + " " 
+    filterString += predicates[i] + " " + this.ConvertToOperator(predicates[i + 1]) + " ";
     if (predicates[i + 2].substring(0, 1) === "'") {
-      filterString += predicates[i + 2]
+      filterString += predicates[i + 2];
     } else {
-      filterString += "'" + predicates[i + 2] + "'"
+      filterString += "'" + predicates[i + 2] + "'";
     }
     if (predicates[i + 3]) {
-      filterString += " " + predicates[i + 3] + " "
+      filterString += " " + predicates[i + 3] + " ";
     }
-    i = i + 3
+    i = i + 3;
   }
-  return filterString
+  return filterString;
 };
 
 // returns a case sensitive string(wraps in "") for $filter query param, replaces operator symbols with operators, breaks mulriple predicates by spaces 
 exports.GetCaseSensitiveFilterQueryString = (predicates) => {
-  filterString = ''
+  filterString = '';
   for (i = 0; i < predicates.length; i++) {
-    filterString += this.GetCaseSensitiveNames(predicates[i]) + " " + this.ConvertToOperator(predicates[i + 1]) + " "
+    filterString += this.GetCaseSensitiveNames(predicates[i]) + " " + this.ConvertToOperator(predicates[i + 1]) + " ";
     if (predicates[i + 2].substring(0, 1) === "'") {
-      filterString += predicates[i + 2]
+      filterString += predicates[i + 2];
     } else {
-      filterString += "'" + predicates[i + 2] + "'"
+      filterString += "'" + predicates[i + 2] + "'";
     }
     if (predicates[i + 3]) {
-      filterString += " " + predicates[i + 3] + " "
+      filterString += " " + predicates[i + 3] + " ";
     }
-    i = i + 3
+    i = i + 3;
   }
-  return filterString
+  return filterString;
 };
 
 // returns the operator value based on odata expression in url
@@ -273,5 +236,5 @@ LEFT JOIN
   TAB.TABLE_SCHEMA =CONS.TABLE_SCHEMA
   AND COL.COLUMN_NAME = CONS.COLUMN_NAME
 ORDER BY 
-TAB.TABLE_NAME`
+TAB.TABLE_NAME`;
 };
