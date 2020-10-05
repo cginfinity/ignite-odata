@@ -4,19 +4,19 @@ const { GetCaseSensitiveUpdateSetColumns, GetInsertionColumnsAndValues, GetFilte
 exports.GetQuery = async (info) => {
   try {
     if (info.method === 'GET') {
-      return await this.GetSelectQuery(info)
+      return await this.GetSelectQuery(info);
     }
     else if (info.method === 'POST' && info.headers['x-http-method'] == "PATCH") {
-      return await this.GetUpdateQuery(info)
+      return await this.GetUpdateQuery(info);
     }
     else if (info.method === 'POST') {
-      return await this.GetInsertQuery(info)
+      return await this.GetInsertQuery(info);
     }
     else if (info.method === 'PUT' || info.method === 'PATCH') {
-      return await this.GetUpdateQuery(info)
+      return await this.GetUpdateQuery(info);
     }
     else if (info.method === 'DELETE') {
-      return await this.GetDeleteQuery(info)
+      return await this.GetDeleteQuery(info);
     }
   } catch (err) {
     return err;
@@ -26,12 +26,12 @@ exports.GetQuery = async (info) => {
 exports.GetSelectQuery = async (info) => {
   try {
     query = '';
-    full_resource_path = info.resource_path
-    query_params = info.query_params
+    full_resource_path = info.resource_path;
+    query_params = info.query_params;
     //isolating service root and entity name
     resource_path = full_resource_path.split('/');
-    entity = resource_path[2]
-    properties = resource_path[3]
+    entity = resource_path[2];
+    properties = resource_path[3];
     //the resource_path array can have atmost 4 components
     //1 The empty element wrapping the odata root service /ServiceRoot/ or /example/ anything the user might like
 
@@ -51,7 +51,7 @@ exports.GetSelectQuery = async (info) => {
       return query = GetMetadataQuery();
     }
     else if (entity === '$batch') {
-      return query = `BatchSegment translation is not supported`
+      return query = `BatchSegment translation is not supported`;
     }
     else {
       //logic to query data using query parameters in url
@@ -82,24 +82,24 @@ exports.GetSelectQuery = async (info) => {
         orderbyadded = false
         if (query_params.$orderby) {
           query += " ORDER BY " + GetCaseSensitiveNames(query_params.$orderby);
-          orderbyadded = true
+          orderbyadded = true;
         }
         if (query_params.$top) {
           if (orderbyadded === true) {
-            query += " LIMIT " + query_params.$top
+            query += " LIMIT " + query_params.$top;
           }
           else {
-            query += " ORDER BY " + GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity)) + " LIMIT " + query_params.$top
-            orderbyadded = true
+            query += " ORDER BY " + GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity)) + " LIMIT " + query_params.$top;
+            orderbyadded = true;
           }
         }
         if (query_params.$skip) {
           if (orderbyadded === true) {
-            query += " OFFSET " + query_params.$skip
+            query += " OFFSET " + query_params.$skip;
           }
           else {
-            query += " ORDER BY " + GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity)) + " OFFSET " + query_params.$skip
-            orderbyadded = true
+            query += " ORDER BY " + GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity)) + " OFFSET " + query_params.$skip;
+            orderbyadded = true;
           }
         }
         if(!orderbyadded){
@@ -118,8 +118,8 @@ exports.GetSelectQuery = async (info) => {
 exports.GetInsertQuery = async (info) => {
   try {
     const data = GetInsertionColumnsAndValues(info.body);
-    CaseSensitiveColumns = GetCaseSensitiveNames(data.columns)
-    query = `INSERT INTO tablename(${CaseSensitiveColumns}) VALUES (${data.Values})`
+    CaseSensitiveColumns = GetCaseSensitiveNames(data.columns);
+    query = `INSERT INTO tablename(${CaseSensitiveColumns}) VALUES (${data.Values})`;
     full_resource_path = info.resource_path;
     //isolating service root and entity name
     resource_path = full_resource_path.split('/');
@@ -129,7 +129,7 @@ exports.GetInsertQuery = async (info) => {
       return query = GetMetadataQuery();
     }
     else if (entity === '$batch') {
-      query = `BatchSegment translation is not supported`
+      query = `BatchSegment translation is not supported`;
     }
     else {
       entity = GetCaseSensitiveNames(entity);
@@ -183,25 +183,25 @@ exports.GetUpdateQuery = async (info) => {
 exports.GetDeleteQuery = async (info) => {
   try {
     query = 'DELETE FROM tablename';
-    full_resource_path = info.resource_path
+    full_resource_path = info.resource_path;
     //isolating service root and entity name
     resource_path = full_resource_path.split('/');
-    entity = resource_path[2]
-    properties = resource_path[3]
+    entity = resource_path[2];
+    properties = resource_path[3];
     if (entity === '$metadata' || entity === '') {
       return query = GetMetadataQuery();
     }
     else if (entity === '$batch') {
-      return query = `BatchSegment translation is not supported`
+      return query = `BatchSegment translation is not supported`;
     }
     else {
       //checking for param in parenthesis 
       if (entity.includes("(") && entity.includes(")")) {
-        entity_with_param = entity
+        entity_with_param = entity;
         entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
         entity_with_param = entity_with_param.split('(');
-        entity = entity_with_param[0]
-        param = entity_with_param[1]
+        entity = entity_with_param[0];
+        param = entity_with_param[1];
         query += " WHERE " + GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity)) + " = " + param;
         entity = GetCaseSensitiveNames(entity);
         info.schema ? entity = info.schema + '.' + entity : entity;

@@ -4,19 +4,19 @@ const { GetUpdateSetColumns, GetInsertionColumnsAndValues, GetMetadataQuery, Get
 exports.GetQuery = async (info) => {
   try {
     if (info.method === 'GET') {
-      return await this.GetSelectQuery(info)
+      return await this.GetSelectQuery(info);
     }
     else if (info.method === 'POST' && info.headers['x-http-method'] == "PATCH") {
-      return await this.GetUpdateQuery(info)
+      return await this.GetUpdateQuery(info);
     }
     else if (info.method === 'POST') {
-      return await this.GetInsertQuery(info)
+      return await this.GetInsertQuery(info);
     }
     else if (info.method === 'PUT' || info.method === 'PATCH') {
-      return await this.GetUpdateQuery(info)
+      return await this.GetUpdateQuery(info);
     }
     else if (info.method === 'DELETE') {
-      return await this.GetDeleteQuery(info)
+      return await this.GetDeleteQuery(info);
     }
   } catch (err) {
     return err;
@@ -26,12 +26,12 @@ exports.GetQuery = async (info) => {
 exports.GetSelectQuery = async (info) => {
   try {
     query = '';
-    full_resource_path = info.resource_path
-    query_params = info.query_params
+    full_resource_path = info.resource_path;
+    query_params = info.query_params;
     //isolating service root and entity name
     resource_path = full_resource_path.split('/');
-    entity = resource_path[2]
-    properties = resource_path[3]
+    entity = resource_path[2];
+    properties = resource_path[3];
     //the resource_path array can have atmost 4 components
     //1 The empty element wrapping the odata root service /ServiceRoot/ or /example/ anything the user might like
 
@@ -51,19 +51,19 @@ exports.GetSelectQuery = async (info) => {
       return query = GetMetadataQuery();
     }
     else if (entity === '$batch') {
-      return query = `BatchSegment translation is not supported`
+      return query = `BatchSegment translation is not supported`;
     }
     else {
       //logic to query data using query parameters in url
       if (isEmpty(query_params) && entity.includes("(")) {
         //case to support get by id in odata e.g. http://127.0.0.1:1880/root/users('Ravi')
         query = 'SELECT * FROM tablename';
-        entity_with_param = entity
+        entity_with_param = entity;
         entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
         entity_with_param = entity_with_param.split('(');
-        entity = entity_with_param[0]
-        param = entity_with_param[1]
-        query += " WHERE " + GetKeyFromModel(info.data_model, entity) + " = " + param
+        entity = entity_with_param[0];
+        param = entity_with_param[1];
+        query += " WHERE " + GetKeyFromModel(info.data_model, entity) + " = " + param;
         properties ? query = query.replace("*", properties) : query;
         info.schema ? entity = info.schema + '.' + entity : entity;
         return query.replace("tablename", entity);
@@ -76,29 +76,29 @@ exports.GetSelectQuery = async (info) => {
         query_params.$select ? query = query.replace("*", query_params.$select) : query;
         if (query_params.$filter) {
           predicates = query_params.$filter.split(' ');
-          query += " WHERE " + GetFilterQueryString(predicates)
+          query += " WHERE " + GetFilterQueryString(predicates);
         }
         orderbyadded = false
         if (query_params.$orderby) {
           query += " ORDER BY " + query_params.$orderby;
-          orderbyadded = true
+          orderbyadded = true;
         }
         if (query_params.$skip) {
           if (orderbyadded === true) {
-            query += " OFFSET " + query_params.$skip + " ROWS"
+            query += " OFFSET " + query_params.$skip + " ROWS";
           }
           else {
-            query += " ORDER BY " + GetKeyFromModel(info.data_model, entity) + " OFFSET " + query_params.$skip + " ROWS"
-            orderbyadded = true
+            query += " ORDER BY " + GetKeyFromModel(info.data_model, entity) + " OFFSET " + query_params.$skip + " ROWS";
+            orderbyadded = true;
           }
         }
         if (query_params.$top) {
           if (orderbyadded === true) {
-            query += " FETCH NEXT " + query_params.$top + " ROWS ONLY"
+            query += " FETCH NEXT " + query_params.$top + " ROWS ONLY";
           }
           else {
-            query += " ORDER BY " + GetKeyFromModel(info.data_model, entity) + " FETCH NEXT " + query_params.$top + " ROWS ONLY"
-            orderbyadded = true
+            query += " ORDER BY " + GetKeyFromModel(info.data_model, entity) + " FETCH NEXT " + query_params.$top + " ROWS ONLY";
+            orderbyadded = true;
           }
         }
         if(!orderbyadded){
@@ -116,23 +116,23 @@ exports.GetSelectQuery = async (info) => {
 exports.GetInsertQuery = async (info) => {
   try {
     const data = GetInsertionColumnsAndValues(info.body);
-    query = `INSERT INTO tablename(${data.columns}) VALUES (${data.Values})`
-    full_resource_path = info.resource_path
+    query = `INSERT INTO tablename(${data.columns}) VALUES (${data.Values})`;
+    full_resource_path = info.resource_path;
     //isolating service root and entity name
     resource_path = full_resource_path.split('/');
-    entity = resource_path[2]
-    properties = resource_path[3]
+    entity = resource_path[2];
+    properties = resource_path[3];
     if (entity === '$metadata' || entity === '') {
       return query = GetMetadataQuery();
     }
     else if (entity === '$batch') {
-      query = `BatchSegment translation is not supported`
+      query = `BatchSegment translation is not supported`;
     }
     else {
       info.schema ? entity = info.schema + '.' + entity : entity;
       query = query.replace("tablename", entity);
     }
-    return query
+    return query;
   } catch (error) {
     return error;
   }
@@ -142,26 +142,26 @@ exports.GetUpdateQuery = async (info) => {
   try {
     const setConditions = GetUpdateSetColumns(info.body);
     query = `UPDATE tablename SET ${setConditions}`;
-    full_resource_path = info.resource_path
+    full_resource_path = info.resource_path;
     //isolating service root and entity name
     resource_path = full_resource_path.split('/');
-    entity = resource_path[2]
-    properties = resource_path[3]
+    entity = resource_path[2];
+    properties = resource_path[3];
     if (entity === '$metadata' || entity === '') {
       return query = GetMetadataQuery();
     }
     else if (entity === '$batch') {
-      query = `BatchSegment translation is not supported`
+      query = `BatchSegment translation is not supported`;
     }
     else {
       //checking for param in parenthesis (key)
       if (entity.includes("(") && entity.includes(")")) {
-        entity_with_param = entity
+        entity_with_param = entity;
         entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
         entity_with_param = entity_with_param.split('(');
-        entity = entity_with_param[0]
-        param = entity_with_param[1]
-        query += " WHERE " + GetKeyFromModel(info.data_model, entity) + " = " + param
+        entity = entity_with_param[0];
+        param = entity_with_param[1];
+        query += " WHERE " + GetKeyFromModel(info.data_model, entity) + " = " + param;
         info.schema ? entity = info.schema + '.' + entity : entity;
         return query.replace("tablename", entity);
       }else{
@@ -177,26 +177,26 @@ exports.GetUpdateQuery = async (info) => {
 exports.GetDeleteQuery = async (info) => {
   try {
     query = 'DELETE FROM tablename';
-    full_resource_path = info.resource_path
+    full_resource_path = info.resource_path;
     //isolating service root and entity name
     resource_path = full_resource_path.split('/');
-    entity = resource_path[2]
-    properties = resource_path[3]
+    entity = resource_path[2];
+    properties = resource_path[3];
     if (entity === '$metadata' || entity === '') {
       return query = GetMetadataQuery();
     }
     else if (entity === '$batch') {
-      return query = `BatchSegment translation is not supported`
+      return query = `BatchSegment translation is not supported`;
     }
     else {
       //checking for param in parenthesis 
       if (entity.includes("(") && entity.includes(")")) {
-        entity_with_param = entity
+        entity_with_param = entity;
         entity_with_param = entity_with_param.substring(0, entity_with_param.length - 1);
         entity_with_param = entity_with_param.split('(');
-        entity = entity_with_param[0]
-        param = entity_with_param[1]
-        query += " WHERE " + GetKeyFromModel(info.data_model, entity) + " = " + param
+        entity = entity_with_param[0];
+        param = entity_with_param[1];
+        query += " WHERE " + GetKeyFromModel(info.data_model, entity) + " = " + param;
         info.schema ? entity = info.schema + '.' + entity : entity;
         return query.replace("tablename", entity);
       }else{
