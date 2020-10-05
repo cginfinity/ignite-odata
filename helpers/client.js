@@ -3,24 +3,24 @@ const { GetAsync, PostAsync, PutAsync, PatchAsync, DeleteAsync } = require('./ca
 exports.client = async (clientInfo) => {
   try {
     if (clientInfo.method === 'GET') {
-      return await GetAsync(clientInfo.reqUrl, clientInfo.reqheaders)
+      return await GetAsync(clientInfo.reqUrl, clientInfo.reqheaders);
     }
     else if (clientInfo.method === 'POST') {
-      return await PostAsync(clientInfo.reqUrl, clientInfo.reqheaders, clientInfo.reqbody)
+      return await PostAsync(clientInfo.reqUrl, clientInfo.reqheaders, clientInfo.reqbody);
     }
     else if (clientInfo.method === 'PUT') {
-      return await PutAsync(clientInfo.reqUrl, clientInfo.reqheaders, clientInfo.reqbody)
+      return await PutAsync(clientInfo.reqUrl, clientInfo.reqheaders, clientInfo.reqbody);
     }
     else if (clientInfo.method === 'PATCH') {
-      return await PatchAsync(clientInfo.reqUrl, clientInfo.reqheaders, clientInfo.reqbody)
+      return await PatchAsync(clientInfo.reqUrl, clientInfo.reqheaders, clientInfo.reqbody);
     }
     else if (clientInfo.method === 'DELETE') {
-      return await DeleteAsync(clientInfo.reqUrl, clientInfo.reqheaders)
+      return await DeleteAsync(clientInfo.reqUrl, clientInfo.reqheaders);
     }
     else {
       return "Please choose a method";
     }
   } catch (err) {
-    return err
+    return err;
   }
 };
