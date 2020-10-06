@@ -67,53 +67,61 @@
         <input type="text" id="node-input-rootURL" placeholder="http://my-serviceroot.url/">
     </div>
     <div class="form-row">
-        <label for="node-input-resource"><i class="fa fa-sitemap"></i> Resource : </label>
-        <input type="text" id="node-input-resource" placeholder="Users or Users('Ravi')">
+        <label for="node-input-resource"><i class="fa fa-table"></i> Resource : </label>
+        <input type="text" id="node-input-resource" placeholder="Users or Users('Superman')">
     </div>
     <div class="form-row" id="node-input-querytoprow">
-        <label for="node-input-querytop"><i class="fa fa-sitemap"></i> $top = </label>
+        <label for="node-input-querytop"><i class="fa fa-filter"></i> $top = </label>
         <input type="text" id="node-input-querytop" placeholder="$top = 10">
     </div>
     <div class="form-row" id="node-input-queryskiprow">
-        <label for="node-input-queryskip"><i class="fa fa-sitemap"></i> $skip = </label>
+        <label for="node-input-queryskip"><i class="fa fa-filter"></i> $skip = </label>
         <input type="text" id="node-input-queryskip" placeholder="$skip = 5">
     </div>
     <div class="form-row" id="node-input-queryorderbyrow">
-        <label for="node-input-queryorderby"><i class="fa fa-sitemap"></i> $orderby = </label>
+        <label for="node-input-queryorderby"><i class="fa fa-filter"></i> $orderby = </label>
         <input type="text" id="node-input-queryorderby" placeholder="$orderby = Email">
     </div>
     <div class="form-row" id="node-input-queryselectrow">
-        <label for="node-input-queryselect"><i class="fa fa-sitemap"></i> $select = </label>
+        <label for="node-input-queryselect"><i class="fa fa-filter"></i> $select = </label>
         <input type="text" id="node-input-queryselect" placeholder="$select = Name, Email">
     </div>
     <div class="form-row" id="node-input-queryfilterrow">
-        <label for="node-input-queryfilter"><i class="fa fa-sitemap"></i> $filter = </label>
-        <input type="text" id="node-input-queryfilter" placeholder="$filter = FirstName eq 'Ravi'">
+        <label for="node-input-queryfilter"><i class="fa fa-filter"></i> $filter = </label>
+        <input type="text" id="node-input-queryfilter" placeholder="$filter = FirstName eq 'Superman'">
     </div>
     <div class="form-row" id="node-input-querycountrow">
-        <label for="node-input-querycount"><i class="fa fa-sitemap"></i> $count = </label>
+        <label for="node-input-querycount"><i class="fa fa-filter"></i> $count = </label>
         <input type="text" id="node-input-querycount" placeholder="$count = true">
     </div>
     <div class="form-row" id="node-input-querysearchrow">
-        <label for="node-input-querysearch"><i class="fa fa-sitemap"></i> $search = </label>
-        <input type="text" id="node-input-querysearch" placeholder="$search = Cyber Gorup">
+        <label for="node-input-querysearch"><i class="fa fa-filter"></i> $search = </label>
+        <input type="text" id="node-input-querysearch" placeholder="$search = Cyber Group">
     </div>
     <div class="form-row" id="node-input-instructionspanel">
-        1. To perform Create Operation you should provide entity in resources field.
+        1. Service Root Url is the base url of your OData Service.
         <br>
-        2. For Update & Delete Operations provide individual entity you want to Update.
+        2. Resource field is the name of the entity you want to access
         <br>
-        3. For PUT, POST & PATCH requests user can provide request body.
+        3. If provided, <i style="color:#AD1625;">msg.payload</i> is attached to request as the request body.
         <br>
-        4. <i style="color:#AD1625;">msg.payload</i> is attached to request as the request body.
+        4. To Override default headers, use<i style="color:#AD1625;">msg.reqHeaders</i> property.
         <br>
-        5. For Authentication purpose user can set custom headers to the request.
-        <br>
-        6. <i style="color:#AD1625;">msg.reqHeaders</i> is attached to request as the request body.
-        <br>
+        5. To Override request url, use<i style="color:#AD1625;">msg.reqUrl</i> property.
     </div>
 </script>
 
 <script type="text/html" data-help-name="odata client">
     <p>A node that helps you consume odata complaint api</p>
+    <div>
+        1. Service Root Url is the base url of your OData Service.
+        <br>
+        2. Resource field is the name of the entity you want to access
+        <br>
+        3. To Override request url, use<i style="color:#AD1625;">msg.reqUrl</i> property.
+        <br>
+        4. To Override default headers, use<i style="color:#AD1625;">msg.reqHeaders</i> property.
+        <br>
+        5. If provided, <i style="color:#AD1625;">msg.payload</i> is attached to request as the request body for PUT POST PATCH requests.
+    </div>
 </script>

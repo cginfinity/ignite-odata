@@ -18,9 +18,6 @@ exports.GetQueries = async (info) => {
       s3: await s3Query(info)
     }
   } catch (err) {
-    return (result = {
-      message: "Couldn't create queries",
-      error: err.message
-    });
+    return err;
   }
 };

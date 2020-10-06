@@ -12,20 +12,19 @@ exports.GetResponse = async (info, data) => {
     }
     if (entity.includes("(") && entity.includes(")")) {
       if (info.query_params.$count === "true") {
-        result = {
+        return result = {
           "@odata.context": serviceRoot + "$metadata" + "#" + entity,
           "@odata.count": ODataCount,
           value: data
         }
-        return result;
       } else {
-        result = {
+        return result = {
           "@odata.context": serviceRoot + "$metadata" + "#" + entity,
           value: data
         }
-        return result;
       }
     }
+    ////add logic for raw value requests
     // if (raw_value_request === undefined && properties === undefined || entity === undefined) {
     //   if (entity === undefined) {
     //     return data;
@@ -37,29 +36,19 @@ exports.GetResponse = async (info, data) => {
     //     }
     //   }
     // }
-    // else if (raw_value_request === undefined && properties !== undefined) {
     if (info.query_params.$count === "true") {
-      result = {
+      return result = {
         "@odata.context": serviceRoot + "$metadata" + "#" + entity + "/" + "$entity",
         "@odata.count": ODataCount,
         value: data
       }
-      return result;
     } else {
-      result = {
+      return result = {
         "@odata.context": serviceRoot + "$metadata" + "#" + entity + "/" + "$entity",
         value: data
       }
-      return result;
     }
-    // }
-    // else {
-    //   return data
-    // }
   } catch (err) {
-    return (result = {
-      message: "Couldn't frame an odata response",
-      error: err.message
-    });
+    return err;
   }
 };
