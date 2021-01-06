@@ -21,24 +21,9 @@ exports.GetInsertionColumnsAndValues = (data) => {
 };
 
 // returns the set conditions for the update query
-// exports.GetUpdateSetColumns = (data) => {
-//   var condition = "", count = 0;
-//   for (key in data) {
-//     if (!key.includes("odata.type")) {
-//       condition += typeof (data[key]) === "string" ? key + "='" + data[key] + "'" : key + "=" + data[key];
-//       if (count !== Object.keys(data).length - 1) {
-//         condition += ",";
-//       }
-//       count++;
-//     }
-//   }
-//   return this.RemoveCharFromEndOfString(condition, ",");
-// };
-
-// returns the set conditions for the update query
-exports.GetUpdateSetColumns = (data, is_casesensitive=false) => {
+exports.GetUpdateSetColumns = (data, is_casesensitive = false) => {
   var condition = "", count = 0;
-  if(is_casesensitive === true){
+  if (is_casesensitive === true) {
     for (key in data) {
       if (!key.includes("odata.type")) {
         condition += typeof (data[key]) === "string" ? this.GetCaseSensitiveNames(key) + "='" + data[key] + "'" : this.GetCaseSensitiveNames(key) + "=" + data[key];
@@ -48,7 +33,7 @@ exports.GetUpdateSetColumns = (data, is_casesensitive=false) => {
         count++;
       }
     }
-  }else{
+  } else {
     for (key in data) {
       if (!key.includes("odata.type")) {
         condition += typeof (data[key]) === "string" ? key + "='" + data[key] + "'" : key + "=" + data[key];
@@ -62,23 +47,6 @@ exports.GetUpdateSetColumns = (data, is_casesensitive=false) => {
   return this.GetCleanString(condition, ",");
 };
 
-// returns the set conditions for the update query, if capital letters are present it returns columns in quotes
-// exports.GetCaseSensitiveUpdateSetColumns = (data) => {
-//   var condition = "", count = 0;
-//   for (key in data) {
-//     if (!key.includes("odata.type")) {
-//       condition +=
-//         typeof data[key] === "string" ?
-//           this.GetCaseSensitiveNames(key) + "='" + data[key] + "'"
-//           :
-//           this.GetCaseSensitiveNames(key) + "=" + data[key]
-//       count !== Object.keys(data).length - 1 ? condition += "," : condition;
-//       count++;
-//     }
-//   }
-//   return this.RemoveCharFromEndOfString(condition, ",");;
-// };
-
 // wraps around column, table name in "" if they have capital letters in it
 exports.GetCaseSensitiveNames = (columns) => {
   columns = columns.split(",");
@@ -86,7 +54,7 @@ exports.GetCaseSensitiveNames = (columns) => {
   count = 0;
   for (let i in columns) {
     let columnName = this.GetCleanString(columns[i], " ");
-    (/[A-Z]/.test(columnName)) ? columnString += `"${columnName}"`: columnString += columnName;
+    (/[A-Z]/.test(columnName)) ? columnString += `"${columnName}"` : columnString += columnName;
     count !== columns.length - 1 ? columnString += ',' : columnString;
     count++;
   }
@@ -140,21 +108,13 @@ exports.GetRequestedEntity = (resource_path) => {
   }
 };
 
-// removes comma present at the end of string and return the new string
-exports.RemoveCharFromEndOfString = (string, char) => {
-  if (string.charAt(string.length - 1) === char) {
-    string = this.RemoveCharFromEndOfString(string.substring(0, string.length - 1), char);
-  }
-  return string;
-};
-
 // removes any given character from the end and start of string 
 exports.GetCleanString = (string, char) => {
   if (string.charAt(0) === char) {
     string = this.GetCleanString(string.substring(1, string.length), char);
   }
-  if (string.charAt(string.length-1) === char) {
-    string = this.GetCleanString(string.substring(0, string.length-1), char);
+  if (string.charAt(string.length - 1) === char) {
+    string = this.GetCleanString(string.substring(0, string.length - 1), char);
   }
   return string;
 };
@@ -175,49 +135,13 @@ exports.GetQueryParamString = (data) => {
   return this.GetCleanString(queryString, "&");
 };
 
-// // returns a string for $filter query param, replaces operator symbols with operators, breaks mulriple predicates by spaces 
-// exports.GetFilterQueryString = (predicates) => {
-//   filterString = '';
-//   for (i = 0; i < predicates.length; i++) {
-//     filterString += predicates[i] + " " + this.ConvertToOperator(predicates[i + 1]) + " ";
-//     if (predicates[i + 2].substring(0, 1) === "'") {
-//       filterString += predicates[i + 2];
-//     } else {
-//       filterString += "'" + predicates[i + 2] + "'";
-//     }
-//     if (predicates[i + 3]) {
-//       filterString += " " + predicates[i + 3] + " ";
-//     }
-//     i = i + 3;
-//   }
-//   return filterString;
-// };
-
-// returns a case sensitive string(wraps in "") for $filter query param, replaces operator symbols with operators, breaks mulriple predicates by spaces 
-// exports.GetCaseSensitiveFilterQueryString = (predicates) => {
-//   filterString = '';
-//   for (i = 0; i < predicates.length; i++) {
-//     filterString += this.GetCaseSensitiveNames(predicates[i]) + " " + this.ConvertToOperator(predicates[i + 1]) + " ";
-//     if (predicates[i + 2].substring(0, 1) === "'") {
-//       filterString += predicates[i + 2];
-//     } else {
-//       filterString += "'" + predicates[i + 2] + "'";
-//     }
-//     if (predicates[i + 3]) {
-//       filterString += " " + predicates[i + 3] + " ";
-//     }
-//     i = i + 3;
-//   }
-//   return filterString;
-// };
-
 // returns a string for $filter query param, replaces operator symbols with operators, breaks mulriple predicates by spaces 
-exports.GetWhereClauseString = (filters, is_casesensitive=false) => {
+exports.GetWhereClauseString = (filters, is_casesensitive = false) => {
   filterString = '';
   var and_filterarray = filters.split(" and ");
-  for(let i in and_filterarray){
+  for (let i in and_filterarray) {
     var or_filterarray = and_filterarray[i].split(" or ");
-    for(let j in or_filterarray){
+    for (let j in or_filterarray) {
       filters = filters.replace(or_filterarray[j], this.ConvertToSqlCondition(or_filterarray[j], is_casesensitive))
     }
   }
@@ -225,135 +149,87 @@ exports.GetWhereClauseString = (filters, is_casesensitive=false) => {
 };
 
 // returns the operator value based on odata expression in url
-// exports.ConvertToOperator = (odataOperator) => {
-//   let operator;
-//   switch (odataOperator) {
-//     case 'eq':
-//       operator = '=';
-//       break;
-//     case 'ne':
-//       operator = '!=';
-//       break;
-//     case 'gt':
-//       operator = '>';
-//       break;
-//     case 'ge':
-//       operator = '>=';
-//       break;
-//     case 'lt':
-//       operator = '<';
-//       break;
-//     case 'le':
-//       operator = '<=';
-//       break;
-//     default:
-//       throw new Error('Invalid operator code, expected one of ["=", "!=", ">", ">=", "<", "<="].');
-//   }
-//   return operator;
-// };
+exports.ConvertToOperator = (odataOperator) => {
+  let operator;
+  switch (odataOperator) {
+    case 'eq':
+      operator = '=';
+      break;
+    case 'ne':
+      operator = '!=';
+      break;
+    case 'gt':
+      operator = '>';
+      break;
+    case 'ge':
+      operator = '>=';
+      break;
+    case 'lt':
+      operator = '<';
+      break;
+    case 'le':
+      operator = '<=';
+      break;
+    default:
+      throw new Error('Invalid operator code, expected one of ["=", "!=", ">", ">=", "<", "<="].');
+  }
+  return operator;
+};
 
 // converts an odata filter condition to sql where condition
-exports.ConvertToSqlCondition = (predicate, is_casesensitive=false) => {
-  if(predicate.includes(" eq ")){
-    let parts = predicate.split(" eq ");
-    let key = parts[0];
+exports.ConvertToSqlCondition = (predicate, is_casesensitive = false) => {
+  let operator = '';
+  let parts = [];
+  if (predicate.includes(" eq ")) {
+    parts = predicate.split(" eq ");
+    operator = "eq";
+  }
+
+  if (predicate.includes(" ne ")) {
+    parts = predicate.split(" ne ");
+    operator = "ne";
+  }
+
+  if (predicate.includes(" gt ")) {
+    parts = predicate.split(" gt ");
+    operator = "gt";
+  }
+
+  if (predicate.includes(" lt ")) {
+    parts = predicate.split(" lt ");
+    operator = "lt";
+  }
+
+  if (predicate.includes(" ge ")) {
+    parts = predicate.split(" ge ");
+    operator = "ge";
+  }
+
+  if (predicate.includes(" le ")) {
+    parts = predicate.split(" le ");
+    operator = "le";
+  }
+
+  let key = parts[0];
+  if(!this.TestFunctionPresence(key)){
     let value = this.GetCleanString(parts[1], " ");
 
     //wrapping value within '' for sql compatibility
-    (value.charAt(0) === "'" && value.charAt(value.length-1) === "'") ? value = `${value}` : value = `'${value}'`;
+    (value.charAt(0) === "'" && value.charAt(value.length - 1) === "'") ? value = `${value}` : value = `'${value}'`;
 
     //wrapping key(column) within "" for case sensitive column name
-    if(is_casesensitive === true){
+    if (is_casesensitive === true) {
       key = this.GetCaseSensitiveNames(key);
     }
-   
     //adding the operator and returning condition
-    return condition = `${key} = ${value}`;
-  }
-  else if(predicate.includes(" ne ")){
-    let parts = predicate.split(" ne ");
-    let key = parts[0];
-    let value = this.GetCleanString(parts[1], " ");
-
-    //wrapping value within '' for sql compatibility
-    (value.charAt(0) === "'" && value.charAt(value.length-1) === "'") ? value = `${value}` : value = `'${value}'`;
-
-    //wrapping key(column) within "" for case sensitive column name
-    if(is_casesensitive === true){
-      key = this.GetCaseSensitiveNames(key)
-    }
-
-    //adding the operator and returning condition
-    return condition = `${key} != ${value}`;
-  }
-  else if(predicate.includes(" gt ")){
-    let parts = predicate.split(" gt ");
-    let key = parts[0];
-    let value = this.GetCleanString(parts[1], " ");
-
-    //wrapping value within '' for sql compatibility
-    (value.charAt(0) === "'" && value.charAt(value.length-1) === "'") ? value = `${value}` : value = `'${value}'`;
-
-    //wrapping key(column) within "" for case sensitive column name
-    if(is_casesensitive === true){
-      key = this.GetCaseSensitiveNames(key)
-    }
-
-    //adding the operator and returning condition
-    return condition = `${key} > ${value}`;
-  }
-  else if(predicate.includes(" lt ")){
-    let parts = predicate.split(" lt ");
-    let key = parts[0];
-    let value = this.GetCleanString(parts[1], " ");
-
-    //wrapping value within '' for sql compatibility
-    (value.charAt(0) === "'" && value.charAt(value.length-1) === "'") ? value = `${value}` : value = `'${value}'`;
-
-    //wrapping key(column) within "" for case sensitive column name
-    if(is_casesensitive === true){
-      key = this.GetCaseSensitiveNames(key)
-    }
-
-    //adding the operator and returning condition
-    return condition = `${key} < ${value}`;
-  }
-  else if(predicate.includes(" ge ")){
-    let parts = predicate.split(" ge ");
-    let key = parts[0];
-    let value = this.GetCleanString(parts[1], " ");
-
-    //wrapping value within '' for sql compatibility
-    (value.charAt(0) === "'" && value.charAt(value.length-1) === "'") ? value = `${value}` : value = `'${value}'`;
-
-    //wrapping key(column) within "" for case sensitive column name
-    if(is_casesensitive === true){
-      key = this.GetCaseSensitiveNames(key)
-    }
-
-    //adding the operator and returning condition
-    return condition = `${key} >= ${value}`;
-  }
-  else if(predicate.includes(" le ")){
-    let parts = predicate.split(" le ");
-    let key = parts[0];
-    let value = this.GetCleanString(parts[1], " ");
-
-    //wrapping value within '' for sql compatibility
-    (value.charAt(0) === "'" && value.charAt(value.length-1) === "'") ? value = `${value}` : value = `'${value}'`;
-
-    //wrapping key(column) within "" for case sensitive column name
-    if(is_casesensitive === true){
-      key = this.GetCaseSensitiveNames(key)
-    }
-
-    //adding the operator and returning condition
-    return condition = `${key} <= ${value}`;
+    return `${key} ${this.ConvertToOperator(operator)} ${value}`;
   }else{
-    return predicate;
+    //write logic to handle functions here
+    return predicate
   }
 };
 
+//---------------------------------Metadata Related Functions-------------------------------------------------
 // returns a query to query metadata from database
 exports.GetMetadataQuery = () => {
   return `SELECT  
@@ -383,4 +259,20 @@ LEFT JOIN
   AND COL.COLUMN_NAME = CONS.COLUMN_NAME
 ORDER BY 
 TAB.TABLE_NAME`;
+};
+
+//---------------------------------SQL Functions----------------------------------------
+// returns true for an empty object
+exports.TestFunctionPresence = (key) => {
+  if(key.charAt(key.length-1) === ")" && (  key.includes("indexof(") ||
+  key.includes("startswith(") || key.includes("endswith(") ||
+  key.includes("substring(") || key.includes("substringof(") ||
+  key.includes("tolower(") || key.includes("toupper(")  ||
+  key.includes("trim(") || key.includes("concat(") ||
+  key.includes("replace(") || key.includes("round(")  ||
+  key.includes("ceiling(") || key.includes("floor(")  )){
+    return true
+  }else{
+    return false;
+  }
 };
