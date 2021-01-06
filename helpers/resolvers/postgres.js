@@ -1,4 +1,4 @@
-const { GetCaseSensitiveUpdateSetColumns, GetInsertionColumnsAndValues, GetWhereClauseString, GetMetadataQuery, GetKeyFromModel, GetCaseSensitiveNames, isEmpty, GetEntity } = require('../functions');
+const { GetUpdateSetColumns, GetInsertionColumnsAndValues, GetWhereClauseString, GetMetadataQuery, GetKeyFromModel, GetCaseSensitiveNames, isEmpty, GetEntity } = require('../functions');
 
 // returns a mysql query based on url, method, req. body and parameters
 exports.GetQuery = async (info) => {
@@ -116,7 +116,7 @@ exports.GetSelectQuery = async (info) => {
 
 exports.GetInsertQuery = async (info) => {
   try {
-    const data = GetInsertionColumnsAndValues(info.body);
+    var data = GetInsertionColumnsAndValues(info.body);
     CaseSensitiveColumns = GetCaseSensitiveNames(data.columns);
     query = `INSERT INTO tablename(${CaseSensitiveColumns}) VALUES (${data.Values})`;
     full_resource_path = info.resource_path;
@@ -143,7 +143,7 @@ exports.GetInsertQuery = async (info) => {
 
 exports.GetUpdateQuery = async (info) => {
   try {
-    const setConditions = GetCaseSensitiveUpdateSetColumns(info.body);
+    var setConditions = GetUpdateSetColumns(info.body, is_casesensitive=true);
     query = `UPDATE tablename SET ${setConditions}`;
     full_resource_path = info.resource_path;
     //isolating service root and entity name

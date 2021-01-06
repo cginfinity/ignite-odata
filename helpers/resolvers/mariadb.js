@@ -114,7 +114,7 @@ exports.GetSelectQuery = async (info) => {
 
 exports.GetInsertQuery = async (info) => {
   try {
-    const data = GetInsertionColumnsAndValues(info.body);
+    var data = GetInsertionColumnsAndValues(info.body);
     query = `INSERT INTO tablename(${data.columns}) VALUES (${data.Values})`;
     full_resource_path = info.resource_path
     //isolating service root and entity name
@@ -139,7 +139,7 @@ exports.GetInsertQuery = async (info) => {
 
 exports.GetUpdateQuery = async (info) => {
   try {
-    const setConditions = GetUpdateSetColumns(info.body);
+    var setConditions = GetUpdateSetColumns(info.body, is_casesensitive=false);
     query = `UPDATE tablename SET ${setConditions}`;
     full_resource_path = info.resource_path;
     //isolating service root and entity name
