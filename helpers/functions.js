@@ -80,12 +80,9 @@ exports.GetCaseSensitiveNames = (columns) => {
   columns = columns.split(",");
   var columnString = '';
   count = 0;
-  for (column in columns) {
-    if (columns[column].charAt(0) === " ") {
-      columns[column] = columns[column].substring(1, columns[column].length);
-    }
-    //Checking quotes if columnName has Capital letters
-    (/[A-Z]/.test(columns[column])) ? columnString += '"' + columns[column] + '"' : columnString += columns[column];
+  for (let i in columns) {
+    let columnName = this.GetCleanString(columns[i], " ");
+    (/[A-Z]/.test(columnName)) ? columnString += `"${columnName}"`: columnString += columnName;
     count !== columns.length - 1 ? columnString += ',' : columnString;
     count++;
   }
@@ -120,10 +117,40 @@ exports.GetEntity = (entity) => {
   return entity_with_param[0];
 };
 
+// returns the name of the resource requested by a service request
+exports.GetRequestedEntity = (resource_path) => {
+  try {
+    resource_path = resource_path.split('/');
+    entity = resource_path[2];
+    if (entity.includes("(") && entity.includes(")")) {
+      entity = entity.split('(');
+      entity = entity[0];
+    }
+    if (entity === '$metadata' || entity === '') {
+      entity = 'metadata';
+    }
+    return entity;
+  }
+  catch (error) {
+    console.log(error);
+  }
+};
+
 // removes comma present at the end of string and return the new string
 exports.RemoveCharFromEndOfString = (string, char) => {
   if (string.charAt(string.length - 1) === char) {
     string = this.RemoveCharFromEndOfString(string.substring(0, string.length - 1), char);
+  }
+  return string;
+};
+
+// removes any given character from the end and start of string 
+exports.GetCleanString = (string, char) => {
+  if (string.charAt(0) === char) {
+    string = this.GetCleanString(string.substring(1, string.length), char);
+  }
+  if (string.charAt(string.length-1) === char) {
+    string = this.GetCleanString(string.substring(0, string.length-1), char);
   }
   return string;
 };
@@ -144,40 +171,79 @@ exports.GetQueryParamString = (data) => {
   return this.RemoveCharFromEndOfString(queryString, "&");
 };
 
-// returns a string for $filter query param, replaces operator symbols with operators, breaks mulriple predicates by spaces 
-exports.GetFilterQueryString = (predicates) => {
-  filterString = '';
-  for (i = 0; i < predicates.length; i++) {
-    filterString += predicates[i] + " " + this.ConvertToOperator(predicates[i + 1]) + " ";
-    if (predicates[i + 2].substring(0, 1) === "'") {
-      filterString += predicates[i + 2];
-    } else {
-      filterString += "'" + predicates[i + 2] + "'";
-    }
-    if (predicates[i + 3]) {
-      filterString += " " + predicates[i + 3] + " ";
-    }
-    i = i + 3;
-  }
-  return filterString;
-};
+// // returns a string for $filter query param, replaces operator symbols with operators, breaks mulriple predicates by spaces 
+// exports.GetFilterQueryString = (predicates) => {
+//   filterString = '';
+//   for (i = 0; i < predicates.length; i++) {
+//     filterString += predicates[i] + " " + this.ConvertToOperator(predicates[i + 1]) + " ";
+//     if (predicates[i + 2].substring(0, 1) === "'") {
+//       filterString += predicates[i + 2];
+//     } else {
+//       filterString += "'" + predicates[i + 2] + "'";
+//     }
+//     if (predicates[i + 3]) {
+//       filterString += " " + predicates[i + 3] + " ";
+//     }
+//     i = i + 3;
+//   }
+//   return filterString;
+// };
 
 // returns a case sensitive string(wraps in "") for $filter query param, replaces operator symbols with operators, breaks mulriple predicates by spaces 
-exports.GetCaseSensitiveFilterQueryString = (predicates) => {
+// exports.GetCaseSensitiveFilterQueryString = (predicates) => {
+//   filterString = '';
+//   for (i = 0; i < predicates.length; i++) {
+//     filterString += this.GetCaseSensitiveNames(predicates[i]) + " " + this.ConvertToOperator(predicates[i + 1]) + " ";
+//     if (predicates[i + 2].substring(0, 1) === "'") {
+//       filterString += predicates[i + 2];
+//     } else {
+//       filterString += "'" + predicates[i + 2] + "'";
+//     }
+//     if (predicates[i + 3]) {
+//       filterString += " " + predicates[i + 3] + " ";
+//     }
+//     i = i + 3;
+//   }
+//   return filterString;
+// };
+
+// returns a string for $filter query param, replaces operator symbols with operators, breaks mulriple predicates by spaces 
+exports.GetWhereClauseString = (filters, is_casesensitive=false) => {
+  // console.log(filters)
+  // var predicates = [];
   filterString = '';
-  for (i = 0; i < predicates.length; i++) {
-    filterString += this.GetCaseSensitiveNames(predicates[i]) + " " + this.ConvertToOperator(predicates[i + 1]) + " ";
-    if (predicates[i + 2].substring(0, 1) === "'") {
-      filterString += predicates[i + 2];
-    } else {
-      filterString += "'" + predicates[i + 2] + "'";
+  var and_filterarray = filters.split(" and ");
+  for(let i in and_filterarray){
+    var or_filterarray = and_filterarray[i].split(" or ");
+    for(let j in or_filterarray){
+      filters = filters.replace(or_filterarray[j], this.ConvertToSqlCondition(or_filterarray[j], is_casesensitive))
+      // predicates.push(or_filterarray[j])
+      // a = or_filterarray[j]
+      // b = await this.ConvertToSqlCondition(or_filterarray[j])
+      // console.log(b)
+      // filters = filters.replace(a, b)
+      // filterString += this.ConvertToOperator(or_filterarray[j]) + " "
+      // if(or_filterarray.length > 1 && j !== 0 && j !== or_filterarray.length-1){
+      //   filterString += " or "
+      // }
     }
-    if (predicates[i + 3]) {
-      filterString += " " + predicates[i + 3] + " ";
-    }
-    i = i + 3;
   }
-  return filterString;
+  // console.log(predicates)
+  // console.log(filters)
+  // filterString = '';
+  // for (i = 0; i < predicates.length; i++) {
+  //   filterString += predicates[i] + " " + this.ConvertToOperator(predicates[i + 1]) + " ";
+  //   if (predicates[i + 2].substring(0, 1) === "'") {
+  //     filterString += predicates[i + 2];
+  //   } else {
+  //     filterString += "'" + predicates[i + 2] + "'";
+  //   }
+  //   if (predicates[i + 3]) {
+  //     filterString += " " + predicates[i + 3] + " ";
+  //   }
+  //   i = i + 3;
+  // }
+  return filters;
 };
 
 // returns the operator value based on odata expression in url
@@ -206,6 +272,108 @@ exports.ConvertToOperator = (odataOperator) => {
       throw new Error('Invalid operator code, expected one of ["=", "!=", ">", ">=", "<", "<="].');
   }
   return operator;
+};
+
+// converts an odata filter condition to sql where condition
+exports.ConvertToSqlCondition = (predicate, is_casesensitive=false) => {
+  if(predicate.includes(" eq ")){
+    let parts = predicate.split(" eq ");
+    let key = parts[0];
+    let value = this.GetCleanString(parts[1], " ");
+
+    //wrapping value within '' for sql compatibility
+    (value.charAt(0) === "'" && value.charAt(value.length-1) === "'") ? value = `${value}` : value = `'${value}'`;
+
+    //wrapping key(column) within "" for case sensitive column name
+    if(is_casesensitive === true){
+      key = `"${key}"`;
+    }
+   
+    //adding the operator and returning condition
+    return condition = `${key} = ${value}`;
+  }
+  else if(predicate.includes(" ne ")){
+    let parts = predicate.split(" ne ");
+    let key = parts[0];
+    let value = this.GetCleanString(parts[1], " ");
+
+    //wrapping value within '' for sql compatibility
+    (value.charAt(0) === "'" && value.charAt(value.length-1) === "'") ? value = `${value}` : value = `'${value}'`;
+
+    //wrapping key(column) within "" for case sensitive column name
+    if(is_casesensitive === true){
+      key = `"${key}"`
+    }
+
+    //adding the operator and returning condition
+    return condition = `${key} != ${value}`;
+  }
+  else if(predicate.includes(" gt ")){
+    let parts = predicate.split(" gt ");
+    let key = parts[0];
+    let value = this.GetCleanString(parts[1], " ");
+
+    //wrapping value within '' for sql compatibility
+    (value.charAt(0) === "'" && value.charAt(value.length-1) === "'") ? value = `${value}` : value = `'${value}'`;
+
+    //wrapping key(column) within "" for case sensitive column name
+    if(is_casesensitive === true){
+      key = `"${key}"`
+    }
+
+    //adding the operator and returning condition
+    return condition = `${key} > ${value}`;
+  }
+  else if(predicate.includes(" lt ")){
+    let parts = predicate.split(" lt ");
+    let key = parts[0];
+    let value = this.GetCleanString(parts[1], " ");
+
+    //wrapping value within '' for sql compatibility
+    (value.charAt(0) === "'" && value.charAt(value.length-1) === "'") ? value = `${value}` : value = `'${value}'`;
+
+    //wrapping key(column) within "" for case sensitive column name
+    if(is_casesensitive === true){
+      key = `"${key}"`
+    }
+
+    //adding the operator and returning condition
+    return condition = `${key} < ${value}`;
+  }
+  else if(predicate.includes(" ge ")){
+    let parts = predicate.split(" ge ");
+    let key = parts[0];
+    let value = this.GetCleanString(parts[1], " ");
+
+    //wrapping value within '' for sql compatibility
+    (value.charAt(0) === "'" && value.charAt(value.length-1) === "'") ? value = `${value}` : value = `'${value}'`;
+
+    //wrapping key(column) within "" for case sensitive column name
+    if(is_casesensitive === true){
+      key = `"${key}"`
+    }
+
+    //adding the operator and returning condition
+    return condition = `${key} >= ${value}`;
+  }
+  else if(predicate.includes(" le ")){
+    let parts = predicate.split(" le ");
+    let key = parts[0];
+    let value = this.GetCleanString(parts[1], " ");
+
+    //wrapping value within '' for sql compatibility
+    (value.charAt(0) === "'" && value.charAt(value.length-1) === "'") ? value = `${value}` : value = `'${value}'`;
+
+    //wrapping key(column) within "" for case sensitive column name
+    if(is_casesensitive === true){
+      key = `"${key}"`
+    }
+
+    //adding the operator and returning condition
+    return condition = `${key} <= ${value}`;
+  }else{
+    return predicate;
+  }
 };
 
 // returns a query to query metadata from database

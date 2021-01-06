@@ -1,4 +1,4 @@
-const { GetUpdateSetColumns, GetInsertionColumnsAndValues, GetMetadataQuery, GetKeyFromModel, GetFilterQueryString, isEmpty, GetEntity} = require('../functions');
+const { GetUpdateSetColumns, GetInsertionColumnsAndValues, GetMetadataQuery, GetKeyFromModel, GetWhereClauseString, isEmpty, GetEntity} = require('../functions');
 
 // returns a mysql query based on url, method, req. body and parameters
 exports.GetQuery = async (info) => {
@@ -75,8 +75,7 @@ exports.GetSelectQuery = async (info) => {
         //TO add columns name to select staements
         query_params.$select ? query = query.replace("*", query_params.$select) : query;
         if (query_params.$filter) {
-          predicates = query_params.$filter.split(' ');
-          query += " WHERE " + GetFilterQueryString(predicates);
+          query += " WHERE " + GetWhereClauseString(query_params.$filter);
         }
         orderbyadded = false
         if (query_params.$orderby) {

@@ -1,4 +1,4 @@
-const { GetCaseSensitiveUpdateSetColumns, GetInsertionColumnsAndValues, GetFilterQueryString, GetCaseSensitiveFilterQueryString, GetMetadataQuery, GetKeyFromModel, GetCaseSensitiveNames, isEmpty, GetEntity } = require('../functions');
+const { GetCaseSensitiveUpdateSetColumns, GetInsertionColumnsAndValues, GetWhereClauseString, GetMetadataQuery, GetKeyFromModel, GetCaseSensitiveNames, isEmpty, GetEntity } = require('../functions');
 
 // returns a mysql query based on url, method, req. body and parameters
 exports.GetQuery = async (info) => {
@@ -76,8 +76,7 @@ exports.GetSelectQuery = async (info) => {
         //To add columns name to select statements
         query_params.$select ? query = query.replace("*", GetCaseSensitiveNames(query_params.$select)) : query;
         if (query_params.$filter) {
-          predicates = query_params.$filter.split(' ');
-          query += " WHERE " + GetCaseSensitiveFilterQueryString(predicates);
+          query += " WHERE " + GetWhereClauseString(query_params.$filter, is_casesensitive=true);
         }
         orderbyadded = false
         if (query_params.$orderby) {
