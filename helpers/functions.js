@@ -178,54 +178,67 @@ exports.ConvertToOperator = (odataOperator) => {
 
 // converts an odata filter condition to sql where condition
 exports.ConvertToSqlCondition = (predicate, is_casesensitive = false) => {
-  let operator = '';
-  let parts = [];
-  if (predicate.includes(" eq ")) {
-    parts = predicate.split(" eq ");
-    operator = "eq";
-  }
+  if(!this.IsFunctionCall(predicate)){
+    let operator = '';
+    let parts = [];
 
-  if (predicate.includes(" ne ")) {
-    parts = predicate.split(" ne ");
-    operator = "ne";
-  }
-
-  if (predicate.includes(" gt ")) {
-    parts = predicate.split(" gt ");
-    operator = "gt";
-  }
-
-  if (predicate.includes(" lt ")) {
-    parts = predicate.split(" lt ");
-    operator = "lt";
-  }
-
-  if (predicate.includes(" ge ")) {
-    parts = predicate.split(" ge ");
-    operator = "ge";
-  }
-
-  if (predicate.includes(" le ")) {
-    parts = predicate.split(" le ");
-    operator = "le";
-  }
-
-  let key = parts[0];
-  if(!this.TestFunctionPresence(key)){
-    let value = this.GetCleanString(parts[1], " ");
-
-    //wrapping value within '' for sql compatibility
-    (value.charAt(0) === "'" && value.charAt(value.length - 1) === "'") ? value = `${value}` : value = `'${value}'`;
-
+    if (predicate.includes(" eq ")) {
+      parts = predicate.split(" eq ");
+      operator = "eq";
+    }
+    if (predicate.includes(" ne ")) {
+      parts = predicate.split(" ne ");
+      operator = "ne";
+    }
+    if (predicate.includes(" gt ")) {
+      parts = predicate.split(" gt ");
+      operator = "gt";
+    }
+    if (predicate.includes(" lt ")) {
+      parts = predicate.split(" lt ");
+      operator = "lt";
+    }
+    if (predicate.includes(" ge ")) {
+      parts = predicate.split(" ge ");
+      operator = "ge";
+    }
+    if (predicate.includes(" le ")) {
+      parts = predicate.split(" le ");
+      operator = "le";
+    }
+    let key = parts[0];
     //wrapping key(column) within "" for case sensitive column name
     if (is_casesensitive === true) {
       key = this.GetCaseSensitiveNames(key);
     }
+
+    let value = this.GetCleanString(parts[1], " ");
+    //wrapping value within '' for sql compatibility
+    (value.charAt(0) === "'" && value.charAt(value.length - 1) === "'") ? value = `${value}` : value = `'${value}'`;
+
     //adding the operator and returning condition
     return `${key} ${this.ConvertToOperator(operator)} ${value}`;
   }else{
-    //write logic to handle functions here
-    return predicate
+    //startswith function support
+    if(predicate.includes("startswith(")){
+      return this.ResolveStartsWith(predicate, is_casesensitive);
+    }
+    //endswith function support
+    else if(predicate.includes("endswith(")){
+      return this.ResolveEndsWith(predicate, is_casesensitive);
+    }
+    //substring function support
+    else if(predicate.includes("substringof(")){
+      return this.ResolveSubstringOf(predicate, is_casesensitive);
+    }
+    //indexof function support
+    else if(predicate.includes("indexof(")){
+      return this.ResolveIndexOf(predicate, is_casesensitive);
+    }
+    //worst case return condition, user can replace it in query
+    else{
+      return predicate
+    }
   }
 };
 
@@ -263,16 +276,179 @@ TAB.TABLE_NAME`;
 
 //---------------------------------SQL Functions----------------------------------------
 // returns true for an empty object
-exports.TestFunctionPresence = (key) => {
-  if(key.charAt(key.length-1) === ")" && (  key.includes("indexof(") ||
-  key.includes("startswith(") || key.includes("endswith(") ||
-  key.includes("substring(") || key.includes("substringof(") ||
-  key.includes("tolower(") || key.includes("toupper(")  ||
-  key.includes("trim(") || key.includes("concat(") ||
-  key.includes("replace(") || key.includes("round(")  ||
-  key.includes("ceiling(") || key.includes("floor(")  )){
-    return true
+exports.IsFunctionCall = (key) => {
+  if( key.includes("indexof(") ||  key.includes("startswith(") || key.includes("endswith(") ||
+  key.includes("substring(") || key.includes("substringof(") ||  key.includes("tolower(") ||
+  key.includes("toupper(")  ||  key.includes("trim(") || key.includes("concat(") ||  
+  key.includes("replace(") || key.includes("round(")  ||  key.includes("ceiling(") || key.includes("floor(")  ){
+    return true;
   }else{
     return false;
   }
+};
+
+//Resolves a filter condition with endswith function call to a sql condition
+exports.ResolveEndsWith = (predicate, is_casesensitive=false) =>{
+  let operator = '';
+  predicate = predicate.replace("endswith(", "");
+
+  if(predicate.includes(") eq true")){
+    // string_toReplace = ") eq true";
+    predicate = predicate.replace(") eq true", "");
+    operator = "LIKE";
+  }else if(predicate.includes(") eq false")){
+    // string_toReplace = ") eq false";
+    predicate = predicate.replace(") eq false", "");
+    operator = "NOT LIKE";
+  }else if(predicate.includes(") ne true")){
+    // string_toReplace = ") ne TRUE";
+    predicate = predicate.replace(") ne true", "");
+    operator = "NOT LIKE";
+  }else if(predicate.includes(") ne false")){
+    // string_toReplace = ") ne false";
+    predicate = predicate.replace(") ne false", "");
+    operator = "LIKE";
+  }else{
+    operator = "LIKE";
+    predicate.charAt(predicate.length-1) === ")" ? predicate = predicate.substring(0, predicate.length-1) : null
+  }
+
+  let parts = predicate.split(",");
+  let key = parts[0];
+  //wrapping key(column) within "" for case sensitive column name
+  if (is_casesensitive === true) {
+    key = this.GetCaseSensitiveNames(key);
+  }
+
+  //removing spaces and colons from the the filter value 
+  let value = this.GetCleanString(parts[1], " ");
+  value = this.GetCleanString(value, "'");
+  value = this.GetCleanString(value, " ");
+
+  return `${key} ${operator} '%${value}'`;
+};
+
+//Resolves a filter condition with startswith function call to a sql condition
+exports.ResolveStartsWith = (predicate, is_casesensitive=false) =>{
+  let operator = '';
+  predicate = predicate.replace("startswith(", "");
+
+  if(predicate.includes(") eq true")){
+    // string_toReplace = ") eq true";
+    predicate = predicate.replace(") eq true", "");
+    operator = "LIKE";
+  }else if(predicate.includes(") eq false")){
+    // string_toReplace = ") eq false";
+    predicate = predicate.replace(") eq false", "");
+    operator = "NOT LIKE";
+  }else if(predicate.includes(") ne true")){
+    // string_toReplace = ") ne TRUE";
+    predicate = predicate.replace(") ne true", "");
+    operator = "NOT LIKE";
+  }else if(predicate.includes(") ne false")){
+    // string_toReplace = ") ne false";
+    predicate = predicate.replace(") ne false", "");
+    operator = "LIKE";
+  }else{
+    operator = "LIKE";
+    predicate.charAt(predicate.length-1) === ")" ? predicate = predicate.substring(0, predicate.length-1) : null
+  }
+
+  let parts = predicate.split(",");
+  let key = parts[0];
+  //wrapping key(column) within "" for case sensitive column name
+  if (is_casesensitive === true) {
+    key = this.GetCaseSensitiveNames(key);
+  }
+  
+  //removing spaces and colons from the the filter value 
+  let value = this.GetCleanString(parts[1], " ");
+  value = this.GetCleanString(value, "'");
+  value = this.GetCleanString(value, " ");
+
+  return `${key} ${operator} '${value}%'`;
+};
+
+//Resolves a filter condition with substringof function call to a sql condition
+exports.ResolveSubstringOf = (predicate, is_casesensitive=false) =>{
+  let operator = '';
+  predicate = predicate.replace("startswith(", "");
+
+  if(predicate.includes(") eq true")){
+    // string_toReplace = ") eq true";
+    predicate = predicate.replace(") eq true", "");
+    operator = "LIKE";
+  }else if(predicate.includes(") eq false")){
+    // string_toReplace = ") eq false";
+    predicate = predicate.replace(") eq false", "");
+    operator = "NOT LIKE";
+  }else if(predicate.includes(") ne true")){
+    // string_toReplace = ") ne TRUE";
+    predicate = predicate.replace(") ne true", "");
+    operator = "NOT LIKE";
+  }else if(predicate.includes(") ne false")){
+    // string_toReplace = ") ne false";
+    predicate = predicate.replace(") ne false", "");
+    operator = "LIKE";
+  }else{
+    operator = "LIKE";
+    predicate.charAt(predicate.length-1) === ")" ? predicate = predicate.substring(0, predicate.length-1) : null
+  }
+
+  let parts = predicate.split(",");
+  let key = parts[0];
+  //wrapping key(column) within "" for case sensitive column name
+  if (is_casesensitive === true) {
+    key = this.GetCaseSensitiveNames(key);
+  }
+
+  //removing spaces and colons from the the filter value 
+  let value = this.GetCleanString(parts[1], " ");
+  value = this.GetCleanString(value, "'");
+  value = this.GetCleanString(value, " ");
+
+  return `${key} ${operator} '%${value}%'`;
+};
+
+// Resolves a filter condition with startswith function call to a sql condition
+exports.ResolveIndexOf = (predicate, is_casesensitive=false) =>{
+  let operator = "";
+  predicate = predicate.replace("indexof(", "");
+
+  let string_toReplace = "";
+  //adding conditions for like, not like all probable cases
+  if(predicate.includes(") eq 0")){
+    // string_toReplace = ") eq 0";
+    predicate = predicate.replace(") eq 0", "");
+    operator = "LIKE";
+  }else if(predicate.includes(") eq -1")){
+    // string_toReplace = ") eq -1"
+    predicate = predicate.replace(") eq -1", "");
+    operator = "NOT LIKE";
+  }else if(predicate.includes(") ne 0")){
+    // string_toReplace = ") ne 0"
+    predicate = predicate.replace(") ne 0", "");
+    operator = "NOT LIKE";
+  }else if(predicate.includes(") ne -1")){
+    // string_toReplace = ") ne -1"
+    predicate = predicate.replace(") ne -1", "");
+    operator = "LIKE";
+  }else{
+    operator = "LIKE";
+    predicate.charAt(predicate.length-1) === ")" ? predicate = predicate.substring(0, predicate.length-1) : null
+  }
+  
+  let parts = predicate.split(",");
+  let key = parts[0];
+  //wrapping key(column) within "" for case sensitive column name
+  if (is_casesensitive === true) {
+    key = this.GetCaseSensitiveNames(key);
+  }
+
+  //removing spaces and colons from the the filter value 
+  let value = this.GetCleanString(parts[1], " ");
+  value = this.GetCleanString(value, "'");
+  value = this.GetCleanString(value, " ");
+
+  return `${key} ${operator} '${value}%'`;
 };
