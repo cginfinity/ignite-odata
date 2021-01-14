@@ -415,7 +415,6 @@ exports.ResolveIndexOf = (predicate, is_casesensitive=false) =>{
   let operator = "";
   predicate = predicate.replace("indexof(", "");
 
-  let string_toReplace = "";
   //adding conditions for like, not like all probable cases
   if(predicate.includes(") eq 0")){
     // string_toReplace = ") eq 0";
@@ -450,5 +449,5 @@ exports.ResolveIndexOf = (predicate, is_casesensitive=false) =>{
   value = this.GetCleanString(value, "'");
   value = this.GetCleanString(value, " ");
 
-  return `${key} ${operator} '${value}%'`;
+  return `${key} ${operator} '%${value}%'`;
 };
