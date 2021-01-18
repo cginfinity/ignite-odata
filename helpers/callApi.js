@@ -8,7 +8,7 @@ exports.GetAsync = async (URL, header) => {
       headers: header,
     })
       .catch(err => {
-          return err;
+        return err;
       })
     return response;
   }
@@ -26,7 +26,7 @@ exports.PostAsync = async (URL, header, data) => {
       data: data
     })
       .catch(err => {
-          return err;
+        return err;
       })
     return response;
   }
@@ -44,7 +44,7 @@ exports.PutAsync = async (URL, header, data) => {
       data: data
     })
       .catch(err => {
-          return err;
+        return err;
       });
     return response;
   }
@@ -62,7 +62,7 @@ exports.PatchAsync = async (URL, header, data) => {
       data: data
     })
       .catch(err => {
-          return err;
+        return err;
       });
     return response;
   }
@@ -79,7 +79,7 @@ exports.DeleteAsync = async (URL, header) => {
       headers: header,
     })
       .catch(err => {
-          return err;
+        return err;
       });
     return response;
   }
@@ -96,7 +96,7 @@ exports.CustomCall = async (URL, header, data, method) => {
       data: data
     })
       .catch(err => {
-          return err;
+        return err;
       });
     return response;
   }

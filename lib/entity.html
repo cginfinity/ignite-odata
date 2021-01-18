@@ -13,224 +13,224 @@
 </script>
 
 <script type="text/javascript">
-(function() {
-    var operators = [
-        {v:"Edm.Int32",t:"Integer"},
-        {v:"Edm.String",t:"String"},
-        {v:"Edm.Boolean",t:"Boolean/Bit"},
-        {v:"Edm.Double",t:"Double/Float"},
-        {v:"Edm.Decimal",t:"Decimal"},
-        {v:"Edm.Date",t:"Date"},
-        {v:"Edm.DateTimeOffset",t:"Timestamp"}
-    ];
+    (function () {
+        var operators = [
+            { v: "Edm.Int32", t: "Integer" },
+            { v: "Edm.String", t: "String" },
+            { v: "Edm.Boolean", t: "Boolean/Bit" },
+            { v: "Edm.Double", t: "Double/Float" },
+            { v: "Edm.Decimal", t: "Decimal" },
+            { v: "Edm.Date", t: "Date" },
+            { v: "Edm.DateTimeOffset", t: "Timestamp" }
+        ];
 
-    RED.nodes.registerType('entity', {
-        color: "#E2D96E",
-        category: 'config',
-        defaults: {
-            name: {value:""},
-            rules: {value:[]},
-            key : {}
-        },
-        inputs: 1,
-        outputs: 1,
-        label: function() {
-            return "edm:entity:" + this.name;
-        },
-        labelStyle: function() {
-            return "edm:entity:" + this.name?"node_label_italic":"";
-        },
-        oneditprepare: function() {
-            var node = this;
+        RED.nodes.registerType('entity', {
+            color: "#E2D96E",
+            category: 'config',
+            defaults: {
+                name: { value: "" },
+                rules: { value: [] },
+                key: {}
+            },
+            inputs: 1,
+            outputs: 1,
+            label: function () {
+                return "edm:entity:" + this.name;
+            },
+            labelStyle: function () {
+                return "edm:entity:" + this.name ? "node_label_italic" : "";
+            },
+            oneditprepare: function () {
+                var node = this;
 
-            var caseLabel = this._("switch.ignorecase");
+                var caseLabel = this._("switch.ignorecase");
 
-            function resizeRule(rule) {
-                var newWidth = rule.width();
-                var selectField = rule.find("select");
-                var type = selectField.val()||"";
-                var valueField = rule.find(".node-input-rule-value");
-                var typeField = rule.find(".node-input-rule-type-value");
-                var numField = rule.find(".node-input-rule-num-value");
-                var expField = rule.find(".node-input-rule-exp-value");
-                var keyField = rule.find(".node-input-rule-key-value");
-                var btwnField1 = rule.find(".node-input-rule-btwn-value");
-                var btwnField2 = rule.find(".node-input-rule-btwn-value2");
-                var selectWidth;
-                if (type.length < 4) {
-                    selectWidth = 60;
-                } else if (type === "regex") {
-                    selectWidth = 147;
-                } else {
-                    selectWidth = 120;
-                }
-                selectField.width(selectWidth);
-                if ((type === "btwn") || (type === "index")) {
-                    btwnField1.typedInput("width",(newWidth-selectWidth-70));
-                    btwnField2.typedInput("width",(newWidth-selectWidth-70));
-                } else if ((type === "head") || (type === "tail")) {
-                    numField.typedInput("width",(newWidth-selectWidth-70));
-                } else if (type === "jsonata_exp") {
-                    expField.typedInput("width",(newWidth-selectWidth-70));
-                } else if (type === "istype") {
-                    typeField.typedInput("width",(newWidth-selectWidth-70));
-                } else {
-                    if (type === "true" || type === "false" || type === "null" || type === "nnull" || type === "empty" || type === "nempty" || type === "else") {
-                        // valueField.hide();
+                function resizeRule(rule) {
+                    var newWidth = rule.width();
+                    var selectField = rule.find("select");
+                    var type = selectField.val() || "";
+                    var valueField = rule.find(".node-input-rule-value");
+                    var typeField = rule.find(".node-input-rule-type-value");
+                    var numField = rule.find(".node-input-rule-num-value");
+                    var expField = rule.find(".node-input-rule-exp-value");
+                    var keyField = rule.find(".node-input-rule-key-value");
+                    var btwnField1 = rule.find(".node-input-rule-btwn-value");
+                    var btwnField2 = rule.find(".node-input-rule-btwn-value2");
+                    var selectWidth;
+                    if (type.length < 4) {
+                        selectWidth = 60;
+                    } else if (type === "regex") {
+                        selectWidth = 147;
                     } else {
-                        valueField.typedInput("width",(newWidth-selectWidth-70));
+                        selectWidth = 120;
+                    }
+                    selectField.width(selectWidth);
+                    if ((type === "btwn") || (type === "index")) {
+                        btwnField1.typedInput("width", (newWidth - selectWidth - 70));
+                        btwnField2.typedInput("width", (newWidth - selectWidth - 70));
+                    } else if ((type === "head") || (type === "tail")) {
+                        numField.typedInput("width", (newWidth - selectWidth - 70));
+                    } else if (type === "jsonata_exp") {
+                        expField.typedInput("width", (newWidth - selectWidth - 70));
+                    } else if (type === "istype") {
+                        typeField.typedInput("width", (newWidth - selectWidth - 70));
+                    } else {
+                        if (type === "true" || type === "false" || type === "null" || type === "nnull" || type === "empty" || type === "nempty" || type === "else") {
+                            // valueField.hide();
+                        } else {
+                            valueField.typedInput("width", (newWidth - selectWidth - 70));
+                        }
                     }
                 }
-            }
 
-            $("#node-input-rule-container").css('min-height','150px').css('min-width','450px').editableList({
-                addItem: function(container,i,opt) {
-                    if (!opt.hasOwnProperty('r')) {
-                        opt.r = {};
-                    }
-                    var rule = opt.r;
-                    if (!rule.hasOwnProperty('t')) {
-                        rule.t = 'eq';
-                    }
-                    if (!opt.hasOwnProperty('i')) {
-                        opt._i = Math.floor((0x99999-0x10000)*Math.random()).toString();
-                    }
-                    container.css({
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap'
-                    });
-                    var row = $('<div/>').appendTo(container);
-                    var row2 = $('<div/>',{style:"padding-top: 5px; padding-left: 175px;"}).appendTo(container);
-                    var row3 = $('<div/>',{style:"padding-top: 5px; padding-left: 102px;"}).appendTo(container);
-                    var selectField = $('<select/>',{style:"width:120px; margin-left: 5px; text-align: center;"}).appendTo(row);
-                    
-                    for (var d in operators) {
-                        if(operators[d].v == operators[1].v)
-                        {
-                            selectField.append($("<option></option>").val(operators[d].v).text(operators[d].t));
+                $("#node-input-rule-container").css('min-height', '150px').css('min-width', '450px').editableList({
+                    addItem: function (container, i, opt) {
+                        if (!opt.hasOwnProperty('r')) {
+                            opt.r = {};
                         }
-                        else
-                        {
-                            selectField.append($("<option></option>").val(operators[d].v).text(operators[d].t));
+                        var rule = opt.r;
+                        if (!rule.hasOwnProperty('t')) {
+                            rule.t = 'eq';
                         }
-                    }
+                        if (!opt.hasOwnProperty('i')) {
+                            opt._i = Math.floor((0x99999 - 0x10000) * Math.random()).toString();
+                        }
+                        container.css({
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap'
+                        });
+                        var row = $('<div/>').appendTo(container);
+                        var row2 = $('<div/>', { style: "padding-top: 5px; padding-left: 175px;" }).appendTo(container);
+                        var row3 = $('<div/>', { style: "padding-top: 5px; padding-left: 102px;" }).appendTo(container);
+                        var selectField = $('<select/>', { style: "width:120px; margin-left: 5px; text-align: center;" }).appendTo(row);
 
-                    function createValueField(){
-                        return $('<input/>',{class:"node-input-rule-value",type:"text",style:"margin-left: 5px;"}).appendTo(row).typedInput({default:'str',types:['str']});
-                    }
-
-                    function createTypeValueField(){
-                        return $('<input/>',{class:"node-input-rule-type-value",type:"text",style:"margin-left: 5px;"}).appendTo(row).typedInput(
-                            {default:'string',types:[
-                            {value:"string",label:RED._("common.type.string"),hasValue:false,icon:"red/images/typedInput/az.png"},
-                            {value:"undefined",label:RED._("common.type.undefined"),hasValue:false},
-                            {value:"null",label:RED._("common.type.null"),hasValue:false}
-                        ]});
-                    }
-
-                    var valueField = null;
-                    var numValueField = null;
-                    var expValueField = null;
-                    var btwnValueField = null;
-                    var btwnValue2Field = null;
-                    var typeValueField = null;
-
-                    var finalspan = $('<span/>',{style:"float: right;margin-top: 6px;"}).appendTo(row);
-                    // finalspan.append(' &#8594; <span class="node-input-rule-index">'+(i+1)+'</span> ');
-                    var caseSensitive = $('<input/>',{id:"node-input-rule-case-"+i,class:"node-input-rule-case",type:"checkbox",style:"width:auto;vertical-align:top"}).appendTo(row2);
-                    $('<label/>',{for:"node-input-rule-case-"+i,style:"margin-left: 3px;"}).text(caseLabel).appendTo(row2);
-                    selectField.on("change", function() {
-                        var type = selectField.val();
-                        if (valueField){
-                            valueField.typedInput('hide');
-                        }
-                        if (expValueField){
-                            expValueField.typedInput('hide');
-                        }
-                        if (numValueField){
-                            numValueField.typedInput('hide');
-                        }
-                        if (typeValueField){
-                            typeValueField.typedInput('hide');
-                        }
-                        if (btwnValueField){
-                            btwnValueField.typedInput('hide');
-                        }
-                        if (btwnValue2Field){
-                            btwnValue2Field.typedInput('hide');
-                        }
-
-                        if (type === "istype") {
-                            if (!typeValueField){
-                                typeValueField = createTypeValueField();
+                        for (var d in operators) {
+                            if (operators[d].v == operators[1].v) {
+                                selectField.append($("<option></option>").val(operators[d].v).text(operators[d].t));
                             }
-                            typeValueField.typedInput('show');
-                        } else if (! (type === "true" || type === "false" || type === "null" || type === "nnull" || type === "empty" || type === "nempty" || type === "else" )) {
-                                if (!valueField){
+                            else {
+                                selectField.append($("<option></option>").val(operators[d].v).text(operators[d].t));
+                            }
+                        }
+
+                        function createValueField() {
+                            return $('<input/>', { class: "node-input-rule-value", type: "text", style: "margin-left: 5px;" }).appendTo(row).typedInput({ default: 'str', types: ['str'] });
+                        }
+
+                        function createTypeValueField() {
+                            return $('<input/>', { class: "node-input-rule-type-value", type: "text", style: "margin-left: 5px;" }).appendTo(row).typedInput(
+                                {
+                                    default: 'string', types: [
+                                        { value: "string", label: RED._("common.type.string"), hasValue: false, icon: "red/images/typedInput/az.png" },
+                                        { value: "undefined", label: RED._("common.type.undefined"), hasValue: false },
+                                        { value: "null", label: RED._("common.type.null"), hasValue: false }
+                                    ]
+                                });
+                        }
+
+                        var valueField = null;
+                        var numValueField = null;
+                        var expValueField = null;
+                        var btwnValueField = null;
+                        var btwnValue2Field = null;
+                        var typeValueField = null;
+
+                        var finalspan = $('<span/>', { style: "float: right;margin-top: 6px;" }).appendTo(row);
+                        // finalspan.append(' &#8594; <span class="node-input-rule-index">'+(i+1)+'</span> ');
+                        var caseSensitive = $('<input/>', { id: "node-input-rule-case-" + i, class: "node-input-rule-case", type: "checkbox", style: "width:auto;vertical-align:top" }).appendTo(row2);
+                        $('<label/>', { for: "node-input-rule-case-" + i, style: "margin-left: 3px;" }).text(caseLabel).appendTo(row2);
+                        selectField.on("change", function () {
+                            var type = selectField.val();
+                            if (valueField) {
+                                valueField.typedInput('hide');
+                            }
+                            if (expValueField) {
+                                expValueField.typedInput('hide');
+                            }
+                            if (numValueField) {
+                                numValueField.typedInput('hide');
+                            }
+                            if (typeValueField) {
+                                typeValueField.typedInput('hide');
+                            }
+                            if (btwnValueField) {
+                                btwnValueField.typedInput('hide');
+                            }
+                            if (btwnValue2Field) {
+                                btwnValue2Field.typedInput('hide');
+                            }
+
+                            if (type === "istype") {
+                                if (!typeValueField) {
+                                    typeValueField = createTypeValueField();
+                                }
+                                typeValueField.typedInput('show');
+                            } else if (!(type === "true" || type === "false" || type === "null" || type === "nnull" || type === "empty" || type === "nempty" || type === "else")) {
+                                if (!valueField) {
                                     valueField = createValueField();
                                 }
                                 valueField.typedInput('show');
-                        }
-                        if (type === "regex") {
-                            row2.show();
-                            row3.hide();
-                        }  else {
-                            row2.hide();
-                            row3.hide();
-                        }
-                        resizeRule(container);
+                            }
+                            if (type === "regex") {
+                                row2.show();
+                                row3.hide();
+                            } else {
+                                row2.hide();
+                                row3.hide();
+                            }
+                            resizeRule(container);
 
-                    });
-                    selectField.val(rule.t);
-                     if (typeof rule.v != "undefined") {
-                        if (!valueField){
-                            valueField = createValueField();
+                        });
+                        selectField.val(rule.t);
+                        if (typeof rule.v != "undefined") {
+                            if (!valueField) {
+                                valueField = createValueField();
+                            }
+                            valueField.typedInput('value', rule.v);
+                            valueField.typedInput('type', rule.vt || 'str');
                         }
-                        valueField.typedInput('value',rule.v);
-                        valueField.typedInput('type',rule.vt||'str');
-                    }
-                    selectField.change();
-                },
-                removeItem: function(opt) {
-                },
-                resizeItem: resizeRule,
-                sortItems: function(rules) {
-                },
-                sortable: true,
-                removable: true
-            });
+                        selectField.change();
+                    },
+                    removeItem: function (opt) {
+                    },
+                    resizeItem: resizeRule,
+                    sortItems: function (rules) {
+                    },
+                    sortable: true,
+                    removable: true
+                });
 
-            for (var i=0;i<this.rules.length;i++) {
-                var rule = this.rules[i];
-                $("#node-input-rule-container").editableList('addItem',{r:rule,i:i});
+                for (var i = 0; i < this.rules.length; i++) {
+                    var rule = this.rules[i];
+                    $("#node-input-rule-container").editableList('addItem', { r: rule, i: i });
+                }
+            },
+            oneditsave: function () {
+                var rules = $("#node-input-rule-container").editableList('items');
+                var node = this;
+                node.rules = [];
+                rules.each(function (i) {
+                    var ruleData = $(this).data('data');
+                    var rule = $(this);
+                    var type = rule.find("select").val();
+                    var r = {
+                        t: type,
+                        v: rule.find(".node-input-rule-value").typedInput('value')
+                    };
+                    node.rules.push(r);
+                });
+            },
+            oneditresize: function (size) {
+                var rows = $("#node-config-dialog-edit-form>div:not(.node-input-rule-container-row)");
+                var height = size.height;
+                for (var i = 0; i < rows.length; i++) {
+                    height -= $(rows[i]).outerHeight(true);
+                }
+                var editorRow = $("#node-config-dialog-edit-form>div.node-input-rule-container-row");
+                height -= (parseInt(editorRow.css("marginTop")) + parseInt(editorRow.css("marginBottom")));
+                height += 16;
+                $("#node-input-rule-container").editableList('height', height);
             }
-        },
-        oneditsave: function() {
-            var rules = $("#node-input-rule-container").editableList('items');
-            var node = this;
-            node.rules = [];
-            rules.each(function(i) {
-                var ruleData = $(this).data('data');
-                var rule = $(this);
-                var type = rule.find("select").val();
-                var r = {
-                    t : type,
-                    v : rule.find(".node-input-rule-value").typedInput('value')
-                };
-                node.rules.push(r);
-            });
-        },
-        oneditresize: function(size) {
-            var rows = $("#node-config-dialog-edit-form>div:not(.node-input-rule-container-row)");
-            var height = size.height;
-            for (var i=0;i<rows.length;i++) {
-                height -= $(rows[i]).outerHeight(true);
-            }
-            var editorRow = $("#node-config-dialog-edit-form>div.node-input-rule-container-row");
-            height -= (parseInt(editorRow.css("marginTop"))+parseInt(editorRow.css("marginBottom")));
-            height += 16;
-            $("#node-input-rule-container").editableList('height',height);
-        }
-    });
-})();
+        });
+    })();
 </script>

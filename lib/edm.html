@@ -1,95 +1,93 @@
-<script type="text/javascript" >
+<script type="text/javascript">
     var _maxModel = 20;
-    RED.nodes.registerType('edm',{
+    RED.nodes.registerType('edm', {
         category: 'config',
         defaults: {
-            namespace: {value:"ignite",required:true},
+            namespace: { value: "ignite", required: true },
             schema: { required: false },
-            entities: { type:"entity", required: false },
-            model1: {  required: false},
-            model2: {  required: false},
-            model3: {  required: false},
-            model4: {  required: false},
-            model5: {  required: false},
-            model6: {  required: false},
-            model7: {  required: false},
-            model8: {  required: false},
-            model9: {  required: false},
-            model10: {  required: false},
-            model11: {  required: false},
-            model12: {  required: false},
-            model13: {  required: false},
-            model14: {  required: false},
-            model15: {  required: false},
-            model16: {  required: false},
-            model17: {  required: false},
-            model18: {  required: false},
-            model19: {  required: false},
-            model20: {  required: false},
+            entities: { type: "entity", required: false },
+            model1: { required: false },
+            model2: { required: false },
+            model3: { required: false },
+            model4: { required: false },
+            model5: { required: false },
+            model6: { required: false },
+            model7: { required: false },
+            model8: { required: false },
+            model9: { required: false },
+            model10: { required: false },
+            model11: { required: false },
+            model12: { required: false },
+            model13: { required: false },
+            model14: { required: false },
+            model15: { required: false },
+            model16: { required: false },
+            model17: { required: false },
+            model18: { required: false },
+            model19: { required: false },
+            model20: { required: false },
         },
-        label: function() {
-            return "edm:"+ this.namespace;
+        label: function () {
+            return "edm:" + this.namespace;
         },
-        oneditprepare: function() {
+        oneditprepare: function () {
             var node = this;
             var model = [];
             for (var index = 1; index <= _maxModel; index++) {
-                if(this["model" + index])
-                {
+                if (this["model" + index]) {
                     model.push(this["model" + index]);
                 }
             }
-            this._resize = function() {
+            this._resize = function () {
                 var rows = $("#node-config-dialog-edit-form>div:not(.node-input-target-list-row)");
                 var height = $("#node-config-dialog-edit-form").height();
-                for (var i=0;i<rows.length;i++) {
+                for (var i = 0; i < rows.length; i++) {
                     height -= $(rows[i]).outerHeight(true);
                 }
                 var editorRow = $("#node-config-dialog-edit-form>div.node-input-target-list-row");
-                editorRow.css("height",height+"px");
+                editorRow.css("height", height + "px");
             };
-            var dirList = $("#node-input-edm-target-container-div").css({width: "100%", height: "100%"})
-                .treeList({multi:true}).on("treelistitemmouseover", function(e, item) {
-                    
-                }).on("treelistitemmouseout", function(e, item) {
+            var dirList = $("#node-input-edm-target-container-div").css({ width: "100%", height: "100%" })
+                .treeList({ multi: true }).on("treelistitemmouseover", function (e, item) {
+
+                }).on("treelistitemmouseout", function (e, item) {
                 });
 
-                
-                $("#node-config-input-entities").on("change", function(e, item) {
-                    var items = [];
-                    var nodeItemMap = {};
-                    RED.nodes.eachConfig(function(n) {
-                        if(n.type == "entity"){
-                            var isChecked = model.indexOf(n.id) !== -1;
 
-                            nodeItemMap[n.id] = {
-                                node: n,
-                                label: n.name,
-                                sublabel: n.type,
-                                selected: isChecked
-                            };
-                            items.push(nodeItemMap[n.id]);
-                        }
-                    });
-                
-                    dirList.treeList('data',items);
+            $("#node-config-input-entities").on("change", function (e, item) {
+                var items = [];
+                var nodeItemMap = {};
+                RED.nodes.eachConfig(function (n) {
+                    if (n.type == "entity") {
+                        var isChecked = model.indexOf(n.id) !== -1;
+
+                        nodeItemMap[n.id] = {
+                            node: n,
+                            label: n.name,
+                            sublabel: n.type,
+                            selected: isChecked
+                        };
+                        items.push(nodeItemMap[n.id]);
+                    }
                 });
-                
+
+                dirList.treeList('data', items);
+            });
+
         },
-        oneditsave: function(){
-            var model = $("#node-input-edm-target-container-div").treeList('selected').map(function(i) { return i.node.id});
+        oneditsave: function () {
+            var model = $("#node-input-edm-target-container-div").treeList('selected').map(function (i) { return i.node.id });
             for (var index = 1; index <= _maxModel; index++) {
-                if(index <= model.length){
+                if (index <= model.length) {
                     $("#node-config-input-model" + index).val(model[index - 1]);
                 }
-                else
-                {
+                else {
                     $("#node-config-input-model" + index).val("_ADD_");
-                }  
+                }
             }
             $("#node-config-input-entities").val("_ADD_");
         },
-        oneditresize: function(size) {
+        oneditresize: function (size) {
             this._resize();
         }
     });

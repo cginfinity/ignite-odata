@@ -1,4 +1,4 @@
-const { GetMetadataQuery, GetKeyFromModel, GetWhereClauseString, isEmpty, GetEntity} = require('../functions');
+const { GetMetadataQuery, GetKeyFromModel, GetWhereClauseString, isEmpty, GetEntity } = require('../functions');
 
 // returns a mysql query based on url, method, req. body and parameters
 exports.GetQuery = async (info) => {
@@ -91,7 +91,7 @@ exports.GetSelectQuery = async (info) => {
             orderbyadded = true;
           }
         }
-        if(!orderbyadded){
+        if (!orderbyadded) {
           query += " ORDER BY " + GetKeyFromModel(info.data_model, entity);
         }
         info.schema ? entity = info.schema + '.' + entity : entity;

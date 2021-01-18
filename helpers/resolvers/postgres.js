@@ -76,7 +76,7 @@ exports.GetSelectQuery = async (info) => {
         //To add columns name to select statements
         query_params.$select ? query = query.replace("*", GetCaseSensitiveNames(query_params.$select)) : query;
         if (query_params.$filter) {
-          query += " WHERE " + GetWhereClauseString(query_params.$filter, is_casesensitive=true);
+          query += " WHERE " + GetWhereClauseString(query_params.$filter, is_casesensitive = true);
         }
         orderbyadded = false
         if (query_params.$orderby) {
@@ -101,7 +101,7 @@ exports.GetSelectQuery = async (info) => {
             orderbyadded = true;
           }
         }
-        if(!orderbyadded){
+        if (!orderbyadded) {
           query += " ORDER BY " + GetCaseSensitiveNames(GetKeyFromModel(info.data_model, entity));
         }
         entity = GetCaseSensitiveNames(entity);
@@ -143,7 +143,7 @@ exports.GetInsertQuery = async (info) => {
 
 exports.GetUpdateQuery = async (info) => {
   try {
-    var setConditions = GetUpdateSetColumns(info.body, is_casesensitive=true);
+    var setConditions = GetUpdateSetColumns(info.body, is_casesensitive = true);
     query = `UPDATE tablename SET ${setConditions}`;
     full_resource_path = info.resource_path;
     //isolating service root and entity name

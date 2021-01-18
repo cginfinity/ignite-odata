@@ -1,4 +1,4 @@
-const { GetUpdateSetColumns, GetInsertionColumnsAndValues, GetMetadataQuery, GetKeyFromModel, GetWhereClauseString, isEmpty, GetEntity} = require('../functions');
+const { GetUpdateSetColumns, GetInsertionColumnsAndValues, GetMetadataQuery, GetKeyFromModel, GetWhereClauseString, isEmpty, GetEntity } = require('../functions');
 
 // returns a mysql query based on url, method, req. body and parameters
 exports.GetQuery = async (info) => {
@@ -100,7 +100,7 @@ exports.GetSelectQuery = async (info) => {
             orderbyadded = true;
           }
         }
-        if(!orderbyadded){
+        if (!orderbyadded) {
           query += " ORDER BY " + GetKeyFromModel(info.data_model, entity);
         }
         info.schema ? entity = info.schema + '.' + entity : entity;
@@ -139,7 +139,7 @@ exports.GetInsertQuery = async (info) => {
 
 exports.GetUpdateQuery = async (info) => {
   try {
-    var setConditions = GetUpdateSetColumns(info.body, is_casesensitive=false);
+    var setConditions = GetUpdateSetColumns(info.body, is_casesensitive = false);
     query = `UPDATE tablename SET ${setConditions}`;
     full_resource_path = info.resource_path;
     //isolating service root and entity name

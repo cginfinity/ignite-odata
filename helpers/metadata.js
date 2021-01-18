@@ -1,10 +1,10 @@
 const builder = require('xmlbuilder');
 
-exports.GetMetadata =  (model) => {
+exports.GetMetadata = (model) => {
   return buildMetadata(model)
 }
 
-function buildMetadata (model) {
+function buildMetadata(model) {
   var entityTypes = []
   for (var typeKey in model.entityTypes) {
     var entityType = {
@@ -40,7 +40,7 @@ function buildMetadata (model) {
     for (var propKey in model.complexTypes[typeKey]) {
       var property = model.complexTypes[typeKey][propKey]
 
-      complexType.Property.push({'@Name': propKey, '@Type': property.type})
+      complexType.Property.push({ '@Name': propKey, '@Type': property.type })
     }
 
     complexTypes.push(complexType)
@@ -77,5 +77,5 @@ function buildMetadata (model) {
     returnObject['edmx:Edmx']['edmx:DataServices'].Schema.ComplexType = complexTypes
   }
 
-  return builder.create(returnObject).end({pretty: true});
+  return builder.create(returnObject).end({ pretty: true });
 }
